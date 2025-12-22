@@ -31,3 +31,4 @@ src/
 - Use React Router for navigation
 - Handle authentication with tokens in localStorage
 - Keep styling minimal and clean
+- Never create additional/unnecessary files like any md files unless asked by user
