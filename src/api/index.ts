@@ -8,3 +8,4 @@ export { apiConfig } from './config';
 export { authService } from './auth.service';
 export { healthService } from './health.service';
 export { testBackendConnection } from './test-connection';
+export { API_ENDPOINTS } from './endpoints';

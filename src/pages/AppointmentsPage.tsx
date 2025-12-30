@@ -16,15 +16,13 @@ import {
 import type { Appointment } from '../features/appointments';
 
 const AppointmentsPage = () => {
-  const [dateFilter, setDateFilter] = useState('');
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [rescheduleDialogOpen, setRescheduleDialogOpen] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
-  // Fetch appointments with optional date filter
-  const filters = dateFilter ? { date: dateFilter } : undefined;
-  const { data: appointments = [], isLoading, error } = useAppointments(filters);
+  // Fetch appointments
+  const { data: appointments = [], isLoading, error } = useAppointments();
 
   const handleReschedule = (appointment: Appointment) => {
     setSelectedAppointment(appointment);
@@ -69,8 +67,6 @@ const AppointmentsPage = () => {
         error={error}
         onReschedule={handleReschedule}
         onCancel={handleCancel}
-        onDateFilterChange={setDateFilter}
-        dateFilter={dateFilter}
       />
 
       {/* Create Dialog */}

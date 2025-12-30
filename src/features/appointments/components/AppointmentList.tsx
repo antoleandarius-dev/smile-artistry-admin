@@ -3,6 +3,7 @@
  * Displays appointments in a table with filtering and actions
  */
 
+import { useMemo } from 'react';
 import {
   Table,
   TableBody,
@@ -17,7 +18,6 @@ import {
   Box,
   CircularProgress,
   Alert,
-  TextField,
   Tooltip,
 } from '@mui/material';
 import {
@@ -26,6 +26,7 @@ import {
   VideoCall as VideoCallIcon,
 } from '@mui/icons-material';
 import type { Appointment, AppointmentType, AppointmentStatus } from '../types';
+import { usePatients, useDoctors, useUsers } from '../hooks';
 import { format, parseISO } from 'date-fns';
 
 interface AppointmentListProps {
@@ -34,8 +35,6 @@ interface AppointmentListProps {
   error: Error | null;
   onReschedule: (appointment: Appointment) => void;
   onCancel: (appointment: Appointment) => void;
-  onDateFilterChange: (date: string) => void;
-  dateFilter: string;
 }
 
 // Helper to format date and time
@@ -52,18 +51,34 @@ const formatDateTime = (dateString: string) => {
 };
 
 // Helper to get status chip color
-const getStatusColor = (status: AppointmentStatus): 'default' | 'success' | 'error' | 'warning' => {
+const getStatusColor = (status: AppointmentStatus): 'default' | 'success' | 'error' | 'warning' | 'info' => {
   switch (status) {
     case 'scheduled':
-      return 'default';
+      return 'info';
+    case 'in_call':
+      return 'warning';
     case 'completed':
       return 'success';
     case 'cancelled':
       return 'error';
-    case 'no-show':
-      return 'warning';
     default:
       return 'default';
+  }
+};
+
+// Helper to get status display label
+const getStatusLabel = (status: AppointmentStatus): string => {
+  switch (status) {
+    case 'scheduled':
+      return 'Scheduled';
+    case 'in_call':
+      return 'In Call';
+    case 'completed':
+      return 'Completed';
+    case 'cancelled':
+      return 'Cancelled';
+    default:
+      return status;
   }
 };
 
@@ -82,40 +97,9 @@ const getAppointmentTypeBadge = (type: AppointmentType) => {
   }
   return (
     <Chip
-      label="In-Clinic"
+      label="In-Person"
       size="small"
       variant="outlined"
-    />
-  );
-};
-
-// Helper to get tele session status badge
-const getTeleSessionBadge = (appointment: Appointment) => {
-  if (appointment.appointment_type !== 'tele' || !appointment.tele_session) {
-    return null;
-  }
-
-  const { status } = appointment.tele_session;
-  let color: 'default' | 'success' | 'info' = 'default';
-  
-  switch (status) {
-    case 'pending':
-      color = 'default';
-      break;
-    case 'active':
-      color = 'success';
-      break;
-    case 'completed':
-      color = 'info';
-      break;
-  }
-
-  return (
-    <Chip
-      label={`Session: ${status}`}
-      size="small"
-      color={color}
-      sx={{ ml: 1 }}
     />
   );
 };
@@ -126,10 +110,35 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
   error,
   onReschedule,
   onCancel,
-  onDateFilterChange,
-  dateFilter,
 }) => {
-  if (isLoading) {
+  const { data: patients = [], isLoading: patientsLoading } = usePatients();
+  const { data: doctors = [], isLoading: doctorsLoading } = useDoctors();
+  const { data: users = [], isLoading: usersLoading } = useUsers();
+
+  // Create lookup maps for efficient name resolution
+  const patientMap = useMemo(() => {
+    return new Map(patients.map(p => [p.id, p.name]));
+  }, [patients]);
+
+  const doctorUserMap = useMemo(() => {
+    return new Map(doctors.map(d => [d.id, d.user_id]));
+  }, [doctors]);
+
+  const userMap = useMemo(() => {
+    return new Map(users.map(u => [u.id, u.name]));
+  }, [users]);
+
+  const getDoctorName = (doctorId: number): string => {
+    const userId = doctorUserMap.get(doctorId);
+    if (userId) {
+      return userMap.get(userId) || `Doctor #${doctorId}`;
+    }
+    return `Doctor #${doctorId}`;
+  };
+
+  const loading = isLoading || patientsLoading || doctorsLoading || usersLoading;
+
+  if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
         <CircularProgress />
@@ -147,19 +156,6 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
 
   return (
     <Box>
-      {/* Date Filter */}
-      <Box sx={{ mb: 3 }}>
-        <TextField
-          label="Filter by Date"
-          type="date"
-          value={dateFilter}
-          onChange={(e) => onDateFilterChange(e.target.value)}
-          InputLabelProps={{ shrink: true }}
-          size="small"
-          sx={{ minWidth: 200 }}
-        />
-      </Box>
-
       {/* Table */}
       {appointments.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
@@ -167,7 +163,7 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
             No appointments found
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            {dateFilter ? 'Try adjusting your filter or create a new appointment' : 'Create your first appointment to get started'}
+            Create your first appointment to get started
           </Typography>
         </Paper>
       ) : (
@@ -186,28 +182,25 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
             </TableHead>
             <TableBody>
               {appointments.map((appointment) => {
-                const { date, time } = formatDateTime(appointment.appointment_date);
+                const { date, time } = formatDateTime(appointment.scheduled_at);
                 const canModify = appointment.status === 'scheduled';
 
                 return (
                   <TableRow key={appointment.id} hover>
                     <TableCell>
-                      {appointment.patient?.name || `Patient #${appointment.patient_id}`}
+                      {patientMap.get(appointment.patient_id) || `Patient #${appointment.patient_id}`}
                     </TableCell>
                     <TableCell>
-                      {appointment.doctor?.name || `Doctor #${appointment.doctor_id}`}
+                      {getDoctorName(appointment.doctor_id)}
                     </TableCell>
                     <TableCell>{date}</TableCell>
                     <TableCell>{time}</TableCell>
                     <TableCell>
-                      <Box display="flex" alignItems="center">
-                        {getAppointmentTypeBadge(appointment.appointment_type)}
-                        {getTeleSessionBadge(appointment)}
-                      </Box>
+                      {getAppointmentTypeBadge(appointment.appointment_type)}
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={appointment.status}
+                        label={getStatusLabel(appointment.status)}
                         size="small"
                         color={getStatusColor(appointment.status)}
                       />

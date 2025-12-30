@@ -3,56 +3,55 @@
  * Type definitions for appointments, patients, and doctors
  */
 
-export type AppointmentType = 'in-clinic' | 'tele';
-export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no-show';
+export type AppointmentType = 'in_person' | 'tele';
+export type AppointmentStatus = 'scheduled' | 'in_call' | 'completed' | 'cancelled';
 export type TeleSessionStatus = 'pending' | 'active' | 'completed';
 
 export interface Patient {
   id: number;
   name: string;
-  email: string;
+  email?: string;
   phone?: string;
 }
 
 export interface Doctor {
   id: number;
-  name: string;
+  user_id: number;
   specialization?: string;
-  email?: string;
+}
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
 }
 
 export interface Appointment {
   id: number;
   patient_id: number;
   doctor_id: number;
-  appointment_date: string; // ISO date string
+  branch_id: number;
   appointment_type: AppointmentType;
+  scheduled_at: string; // ISO date-time string
   status: AppointmentStatus;
-  notes?: string;
-  patient?: Patient;
-  doctor?: Doctor;
-  tele_session?: {
-    id: number;
-    status: TeleSessionStatus;
-    session_url?: string;
-  };
+  created_at: string;
 }
 
 export interface CreateAppointmentRequest {
   patient_id: number;
   doctor_id: number;
-  appointment_date: string; // ISO date string
+  branch_id: number;
   appointment_type: AppointmentType;
-  notes?: string;
+  scheduled_at: string; // ISO date-time string
 }
 
 export interface RescheduleAppointmentRequest {
-  appointment_date: string; // ISO date string
+  scheduled_at: string; // ISO date-time string
 }
 
 export interface AppointmentFilters {
-  date?: string; // ISO date string (YYYY-MM-DD)
+  branch_id?: number;
   doctor_id?: number;
   patient_id?: number;
-  status?: AppointmentStatus;
+  status_filter?: AppointmentStatus;
 }

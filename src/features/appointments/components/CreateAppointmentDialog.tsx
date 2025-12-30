@@ -3,7 +3,7 @@
  * Dialog for creating a new appointment
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -16,7 +16,7 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { useCreateAppointment, usePatients, useDoctors } from '../hooks';
+import { useCreateAppointment, usePatients, useDoctors, useUsers } from '../hooks';
 import type { AppointmentType } from '../types';
 
 interface CreateAppointmentDialogProps {
@@ -28,15 +28,33 @@ const CreateAppointmentDialog: React.FC<CreateAppointmentDialogProps> = ({ open,
   const [formData, setFormData] = useState({
     patient_id: '',
     doctor_id: '',
+    branch_id: '1', // Default branch - in real app would come from user context
     appointment_date: '',
     appointment_time: '',
-    appointment_type: 'in-clinic' as AppointmentType,
-    notes: '',
+    appointment_type: 'in_person' as AppointmentType,
   });
 
   const createMutation = useCreateAppointment();
   const { data: patients, isLoading: loadingPatients } = usePatients();
   const { data: doctors, isLoading: loadingDoctors } = useDoctors();
+  const { data: users, isLoading: loadingUsers } = useUsers();
+
+  // Create lookup map for doctor names
+  const doctorUserMap = useMemo(() => {
+    return new Map(doctors?.map(d => [d.id, d.user_id]) || []);
+  }, [doctors]);
+
+  const userMap = useMemo(() => {
+    return new Map(users?.map(u => [u.id, u.name]) || []);
+  }, [users]);
+
+  const getDoctorName = (doctorId: number): string => {
+    const userId = doctorUserMap.get(doctorId);
+    if (userId) {
+      return userMap.get(userId) || `Doctor #${doctorId}`;
+    }
+    return `Doctor #${doctorId}`;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,19 +66,19 @@ const CreateAppointmentDialog: React.FC<CreateAppointmentDialogProps> = ({ open,
       await createMutation.mutateAsync({
         patient_id: Number(formData.patient_id),
         doctor_id: Number(formData.doctor_id),
-        appointment_date: appointmentDateTime,
+        branch_id: Number(formData.branch_id),
         appointment_type: formData.appointment_type,
-        notes: formData.notes || undefined,
+        scheduled_at: appointmentDateTime,
       });
 
       // Reset form and close dialog
       setFormData({
         patient_id: '',
         doctor_id: '',
+        branch_id: '1',
         appointment_date: '',
         appointment_time: '',
-        appointment_type: 'in-clinic',
-        notes: '',
+        appointment_type: 'in_person',
       });
       onClose();
     } catch (error) {
@@ -74,10 +92,10 @@ const CreateAppointmentDialog: React.FC<CreateAppointmentDialogProps> = ({ open,
       setFormData({
         patient_id: '',
         doctor_id: '',
+        branch_id: '1',
         appointment_date: '',
         appointment_time: '',
-        appointment_type: 'in-clinic',
-        notes: '',
+        appointment_type: 'in_person',
       });
       createMutation.reset();
       onClose();
@@ -114,7 +132,7 @@ const CreateAppointmentDialog: React.FC<CreateAppointmentDialogProps> = ({ open,
             >
               {patients?.map((patient) => (
                 <MenuItem key={patient.id} value={patient.id}>
-                  {patient.name} {patient.email && `(${patient.email})`}
+                  {patient.name}
                 </MenuItem>
               ))}
             </TextField>
@@ -126,12 +144,12 @@ const CreateAppointmentDialog: React.FC<CreateAppointmentDialogProps> = ({ open,
               value={formData.doctor_id}
               onChange={(e) => setFormData({ ...formData, doctor_id: e.target.value })}
               required
-              disabled={loadingDoctors}
-              helperText={loadingDoctors ? 'Loading doctors...' : ''}
+              disabled={loadingDoctors || loadingUsers}
+              helperText={loadingDoctors || loadingUsers ? 'Loading doctors...' : ''}
             >
               {doctors?.map((doctor) => (
                 <MenuItem key={doctor.id} value={doctor.id}>
-                  {doctor.name}
+                  {getDoctorName(doctor.id)}
                   {doctor.specialization && ` - ${doctor.specialization}`}
                 </MenuItem>
               ))}
@@ -170,18 +188,9 @@ const CreateAppointmentDialog: React.FC<CreateAppointmentDialogProps> = ({ open,
               }
               required
             >
-              <MenuItem value="in-clinic">In-Clinic</MenuItem>
+              <MenuItem value="in_person">In-Person</MenuItem>
               <MenuItem value="tele">Tele-Consult</MenuItem>
             </TextField>
-
-            {/* Notes */}
-            <TextField
-              label="Notes (Optional)"
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              multiline
-              rows={3}
-            />
           </Box>
         </DialogContent>
         <DialogActions>

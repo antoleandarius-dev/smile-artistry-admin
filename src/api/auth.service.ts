@@ -1,4 +1,5 @@
 import apiClient from './client';
+import { API_ENDPOINTS } from './endpoints';
 
 interface LoginResponse {
   access_token: string;
@@ -21,7 +22,7 @@ interface UserInfo {
 export const authService = {
   login: async (email: string, password: string): Promise<{ token: string; user: UserInfo }> => {
     // Backend expects JSON with email and password fields
-    const response = await apiClient.post<LoginResponse>('/auth/login', {
+    const response = await apiClient.post<LoginResponse>(API_ENDPOINTS.AUTH.LOGIN, {
       email,
       password,
     });

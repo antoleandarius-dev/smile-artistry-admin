@@ -76,16 +76,16 @@ const CancelConfirmationDialog: React.FC<CancelConfirmationDialogProps> = ({
           {appointment && (
             <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
               <Typography variant="body2" gutterBottom>
-                <strong>Patient:</strong> {appointment.patient?.name || `#${appointment.patient_id}`}
+                <strong>Patient ID:</strong> {appointment.patient_id}
               </Typography>
               <Typography variant="body2" gutterBottom>
-                <strong>Doctor:</strong> {appointment.doctor?.name || `#${appointment.doctor_id}`}
+                <strong>Doctor ID:</strong> {appointment.doctor_id}
               </Typography>
               <Typography variant="body2" gutterBottom>
-                <strong>Date & Time:</strong> {formatDateTime(appointment.appointment_date)}
+                <strong>Date & Time:</strong> {formatDateTime(appointment.scheduled_at)}
               </Typography>
               <Typography variant="body2">
-                <strong>Type:</strong> {appointment.appointment_type === 'tele' ? 'Tele-Consult' : 'In-Clinic'}
+                <strong>Type:</strong> {appointment.appointment_type === 'tele' ? 'Tele-Consult' : 'In-Person'}
               </Typography>
             </Box>
           )}

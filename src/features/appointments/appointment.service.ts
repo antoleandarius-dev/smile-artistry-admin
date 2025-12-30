@@ -3,7 +3,7 @@
  * Handles all appointment-related API calls
  */
 
-import apiClient from '../../api/client';
+import { apiClient, API_ENDPOINTS } from '../../api';
 import type {
   Appointment,
   CreateAppointmentRequest,
@@ -11,6 +11,7 @@ import type {
   AppointmentFilters,
   Patient,
   Doctor,
+  User,
 } from './types';
 
 export const appointmentService = {
@@ -20,8 +21,8 @@ export const appointmentService = {
   getAppointments: async (filters?: AppointmentFilters): Promise<Appointment[]> => {
     const params = new URLSearchParams();
     
-    if (filters?.date) {
-      params.append('date', filters.date);
+    if (filters?.branch_id) {
+      params.append('branch_id', filters.branch_id.toString());
     }
     if (filters?.doctor_id) {
       params.append('doctor_id', filters.doctor_id.toString());
@@ -29,13 +30,15 @@ export const appointmentService = {
     if (filters?.patient_id) {
       params.append('patient_id', filters.patient_id.toString());
     }
-    if (filters?.status) {
-      params.append('status', filters.status);
+    if (filters?.status_filter) {
+      params.append('status_filter', filters.status_filter);
     }
 
-    const response = await apiClient.get<Appointment[]>(
-      `/appointments${params.toString() ? `?${params.toString()}` : ''}`
-    );
+    const url = params.toString() 
+      ? `${API_ENDPOINTS.APPOINTMENTS.LIST}?${params.toString()}`
+      : API_ENDPOINTS.APPOINTMENTS.LIST;
+
+    const response = await apiClient.get<Appointment[]>(url);
     
     return response.data;
   },
@@ -44,7 +47,7 @@ export const appointmentService = {
    * Get a single appointment by ID
    */
   getAppointment: async (id: number): Promise<Appointment> => {
-    const response = await apiClient.get<Appointment>(`/appointments/${id}`);
+    const response = await apiClient.get<Appointment>(API_ENDPOINTS.APPOINTMENTS.GET(id));
     return response.data;
   },
 
@@ -52,7 +55,7 @@ export const appointmentService = {
    * Create a new appointment
    */
   createAppointment: async (data: CreateAppointmentRequest): Promise<Appointment> => {
-    const response = await apiClient.post<Appointment>('/appointments', data);
+    const response = await apiClient.post<Appointment>(API_ENDPOINTS.APPOINTMENTS.CREATE, data);
     return response.data;
   },
 
@@ -63,7 +66,10 @@ export const appointmentService = {
     id: number,
     data: RescheduleAppointmentRequest
   ): Promise<Appointment> => {
-    const response = await apiClient.patch<Appointment>(`/appointments/${id}`, data);
+    const response = await apiClient.patch<Appointment>(
+      API_ENDPOINTS.APPOINTMENTS.RESCHEDULE(id),
+      data
+    );
     return response.data;
   },
 
@@ -71,9 +77,10 @@ export const appointmentService = {
    * Cancel an appointment
    */
   cancelAppointment: async (id: number): Promise<Appointment> => {
-    const response = await apiClient.patch<Appointment>(`/appointments/${id}`, {
-      status: 'cancelled',
-    });
+    const response = await apiClient.patch<Appointment>(
+      API_ENDPOINTS.APPOINTMENTS.CANCEL(id),
+      {}
+    );
     return response.data;
   },
 
@@ -81,7 +88,7 @@ export const appointmentService = {
    * Get all patients (for appointment creation)
    */
   getPatients: async (): Promise<Patient[]> => {
-    const response = await apiClient.get<Patient[]>('/patients');
+    const response = await apiClient.get<Patient[]>(API_ENDPOINTS.PATIENTS.LIST);
     return response.data;
   },
 
@@ -89,7 +96,15 @@ export const appointmentService = {
    * Get all doctors (for appointment creation)
    */
   getDoctors: async (): Promise<Doctor[]> => {
-    const response = await apiClient.get<Doctor[]>('/doctors');
+    const response = await apiClient.get<Doctor[]>(API_ENDPOINTS.DOCTORS.LIST);
+    return response.data;
+  },
+
+  /**
+   * Get all users (for mapping doctor/patient names)
+   */
+  getUsers: async (): Promise<User[]> => {
+    const response = await apiClient.get<User[]>(API_ENDPOINTS.USERS.LIST);
     return response.data;
   },
 };

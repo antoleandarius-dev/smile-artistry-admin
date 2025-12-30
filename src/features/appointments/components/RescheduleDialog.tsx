@@ -35,7 +35,7 @@ const RescheduleDialog: React.FC<RescheduleDialogProps> = ({
   const initialDateTime = useMemo(() => {
     if (!appointment) return { date: '', time: '' };
     try {
-      const appointmentDate = parseISO(appointment.appointment_date);
+      const appointmentDate = parseISO(appointment.scheduled_at);
       return {
         date: format(appointmentDate, 'yyyy-MM-dd'),
         time: format(appointmentDate, 'HH:mm'),
@@ -62,7 +62,7 @@ const RescheduleDialog: React.FC<RescheduleDialogProps> = ({
     try {
       await rescheduleMutation.mutateAsync({
         id: appointment.id,
-        data: { appointment_date: newDateTime },
+        data: { scheduled_at: newDateTime },
       });
 
       // Reset and close
@@ -100,10 +100,10 @@ const RescheduleDialog: React.FC<RescheduleDialogProps> = ({
             {appointment && (
               <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
                 <Typography variant="body2" color="text.secondary">
-                  Patient: <strong>{appointment.patient?.name || `#${appointment.patient_id}`}</strong>
+                  Patient ID: <strong>{appointment.patient_id}</strong>
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Doctor: <strong>{appointment.doctor?.name || `#${appointment.doctor_id}`}</strong>
+                  Doctor ID: <strong>{appointment.doctor_id}</strong>
                 </Typography>
               </Box>
             )}

@@ -5,6 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { appointmentService } from './appointment.service';
+import { useDoctors as useSharedDoctors } from '../doctors';
 import type {
   AppointmentFilters,
   CreateAppointmentRequest,
@@ -19,7 +20,7 @@ export const appointmentKeys = {
   details: () => [...appointmentKeys.all, 'detail'] as const,
   detail: (id: number) => [...appointmentKeys.details(), id] as const,
   patients: ['patients'] as const,
-  doctors: ['doctors'] as const,
+  users: ['users'] as const,
 };
 
 /**
@@ -103,11 +104,19 @@ export const usePatients = () => {
 };
 
 /**
- * Hook to fetch all doctors
+ * Hook to fetch all doctors (uses shared doctor hook from doctors feature)
+ * @deprecated Use useDoctors from '../doctors' feature directly instead
  */
 export const useDoctors = () => {
+  return useSharedDoctors();
+};
+
+/**
+ * Hook to fetch all users
+ */
+export const useUsers = () => {
   return useQuery({
-    queryKey: appointmentKeys.doctors,
-    queryFn: () => appointmentService.getDoctors(),
+    queryKey: appointmentKeys.users,
+    queryFn: () => appointmentService.getUsers(),
   });
 };

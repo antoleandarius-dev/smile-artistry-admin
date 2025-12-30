@@ -22,6 +22,9 @@ apiClient.interceptors.request.use(
     const token = getAuthToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('✅ Auth token attached to request:', config.url);
+    } else {
+      console.warn('⚠️ No auth token found for request:', config.url);
     }
     return config;
   },
