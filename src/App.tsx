@@ -13,6 +13,7 @@ import AdminDoctorsPage from './pages/AdminDoctorsPage';
 import AdminUsersPage from './pages/AdminUsersPage';
 import AdminBranchesPage from './pages/AdminBranchesPage';
 import AdminTeleConsultsPage from './pages/AdminTeleConsultsPage';
+import AdminAuditLogsPage from './pages/AdminAuditLogsPage';
 import RecordsPage from './pages/RecordsPage';
 
 const queryClient = new QueryClient();
@@ -107,6 +108,16 @@ function App() {
                 <AdminProtectedRoute>
                   <MainLayout>
                     <AdminTeleConsultsPage />
+                  </MainLayout>
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/audit-logs"
+              element={
+                <AdminProtectedRoute>
+                  <MainLayout>
+                    <AdminAuditLogsPage />
                   </MainLayout>
                 </AdminProtectedRoute>
               }

@@ -19,6 +19,7 @@ import SecurityIcon from '@mui/icons-material/Security';
 import BusinessIcon from '@mui/icons-material/Business';
 import FolderIcon from '@mui/icons-material/Folder';
 import VideoCallIcon from '@mui/icons-material/VideoCall';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { logout, getCurrentUser } from '../shared/utils/auth';
@@ -58,6 +59,7 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
     { text: 'Users & Roles', icon: <SecurityIcon />, path: '/admin/users' },
     { text: 'Branch Management', icon: <BusinessIcon />, path: '/admin/branches' },
     { text: 'Tele-Consultations', icon: <VideoCallIcon />, path: '/admin/tele-consults' },
+    { text: 'Audit Logs', icon: <AssignmentIcon />, path: '/admin/audit-logs' },
   ];
 
   // Check if current user is admin

@@ -114,4 +114,12 @@ export const API_ENDPOINTS = {
   WEBHOOKS: {
     TELE_SESSION_END: '/webhooks/tele-session/end',
   },
+
+  // Audit Logs
+  AUDIT_LOGS: {
+    LIST: '/audit-logs/',
+    GET: (id: number) => `/audit-logs/${id}`,
+    ACTIONS: '/audit-logs/actions/distinct',
+    ENTITY_TYPES: '/audit-logs/entity-types/distinct',
+  },
 } as const;
