@@ -3,14 +3,23 @@
  * Type definitions for doctors and their availability
  */
 
+export interface Branch {
+  id: number;
+  name: string;
+}
+
 export interface Doctor {
   id: number;
   user_id: number;
   name: string;
+  email?: string;
+  phone?: string;
   specialization?: string;
+  registration_no?: string;
   registration_number?: string;
   branch_id?: number;
   branch_name?: string;
+  branches?: Branch[];
   is_active: boolean;
   created_at?: string;
   updated_at?: string;
@@ -21,8 +30,6 @@ export interface Doctor {
  */
 export interface DoctorDetail extends Doctor {
   availability?: Availability;
-  email?: string;
-  phone?: string;
 }
 
 /**

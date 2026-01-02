@@ -8,6 +8,7 @@ import DashboardPage from './pages/DashboardPage';
 import AppointmentsPage from './pages/AppointmentsPage';
 import PatientsPage from './pages/PatientsPage';
 import DoctorsPage from './pages/DoctorsPage';
+import AdminDoctorsPage from './pages/AdminDoctorsPage';
 import RecordsPage from './pages/RecordsPage';
 
 const queryClient = new QueryClient();
@@ -62,6 +63,16 @@ function App() {
                 <ProtectedRoute>
                   <MainLayout>
                     <DoctorsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/doctors"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <AdminDoctorsPage />
                   </MainLayout>
                 </ProtectedRoute>
               }

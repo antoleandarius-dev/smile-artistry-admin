@@ -7,11 +7,14 @@ import {
   ListItemText,
   Toolbar,
   Divider,
+  Typography,
+  Box,
 } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import PeopleIcon from '@mui/icons-material/People';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import FolderIcon from '@mui/icons-material/Folder';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -38,12 +41,16 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
     navigate('/login');
   };
 
-  const menuItems = [
+  const mainMenuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Appointments', icon: <CalendarMonthIcon />, path: '/appointments' },
     { text: 'Patients', icon: <PeopleIcon />, path: '/patients' },
     { text: 'Doctors', icon: <LocalHospitalIcon />, path: '/doctors' },
     { text: 'Records', icon: <FolderIcon />, path: '/records' },
+  ];
+
+  const adminMenuItems = [
+    { text: 'Doctor Management', icon: <ManageAccountsIcon />, path: '/admin/doctors' },
   ];
 
   return (
@@ -62,7 +69,26 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
     >
       <Toolbar />
       <List>
-        {menuItems.map((item) => (
+        {mainMenuItems.map((item) => (
+          <ListItem key={item.text} disablePadding>
+            <ListItemButton 
+              onClick={() => handleNavigation(item.path)}
+              selected={location.pathname === item.path}
+            >
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+      <Divider />
+      <Box sx={{ px: 2, py: 1.5 }}>
+        <Typography variant="caption" sx={{ fontWeight: 600, textTransform: 'uppercase', color: 'text.secondary' }}>
+          Admin
+        </Typography>
+      </Box>
+      <List>
+        {adminMenuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
             <ListItemButton 
               onClick={() => handleNavigation(item.path)}

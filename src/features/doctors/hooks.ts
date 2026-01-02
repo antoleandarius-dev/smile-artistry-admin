@@ -3,9 +3,10 @@
  * React Query hooks for doctor data management
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { doctorService } from './doctor.service';
 import type { DoctorFilters } from './types';
+import type { CreateDoctorRequest, UpdateDoctorStatusRequest, AssignDoctorBranchesRequest } from './doctor.service';
 
 // Query keys
 export const doctorKeys = {
@@ -58,5 +59,54 @@ export const useSearchDoctors = (query: string) => {
     queryKey: doctorKeys.search(query),
     queryFn: () => doctorService.searchDoctors(query),
     enabled: !!query && query.length > 0,
+  });
+};
+
+/**
+ * Hook to create a new doctor (admin only)
+ */
+export const useCreateDoctor = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (doctorData: CreateDoctorRequest) => doctorService.createDoctor(doctorData),
+    onSuccess: () => {
+      // Invalidate doctor list to refetch
+      queryClient.invalidateQueries({ queryKey: doctorKeys.lists() });
+    },
+  });
+};
+
+/**
+ * Hook to update doctor status (admin only)
+ */
+export const useUpdateDoctorStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ doctorId, statusUpdate }: { doctorId: number; statusUpdate: UpdateDoctorStatusRequest }) =>
+      doctorService.updateDoctorStatus(doctorId, statusUpdate),
+    onSuccess: (data) => {
+      // Invalidate doctor queries
+      queryClient.invalidateQueries({ queryKey: doctorKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: doctorKeys.detail(data.id) });
+    },
+  });
+};
+
+/**
+ * Hook to assign branches to doctor (admin only)
+ */
+export const useAssignDoctorBranches = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ doctorId, branchesData }: { doctorId: number; branchesData: AssignDoctorBranchesRequest }) =>
+      doctorService.assignDoctorBranches(doctorId, branchesData),
+    onSuccess: (data) => {
+      // Invalidate doctor queries
+      queryClient.invalidateQueries({ queryKey: doctorKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: doctorKeys.detail(data.id) });
+    },
   });
 };

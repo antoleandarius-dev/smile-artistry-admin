@@ -6,6 +6,24 @@
 import { apiClient, API_ENDPOINTS } from '../../api';
 import type { Doctor, DoctorDetail, DoctorFilters, Availability } from './types';
 
+export interface CreateDoctorRequest {
+  name: string;
+  email: string;
+  phone?: string;
+  specialization: string;
+  registration_no: string;
+  password: string;
+  branch_ids?: number[];
+}
+
+export interface UpdateDoctorStatusRequest {
+  is_active: boolean;
+}
+
+export interface AssignDoctorBranchesRequest {
+  branch_ids: number[];
+}
+
 export const doctorService = {
   /**
    * Get all doctors with optional filters
@@ -56,6 +74,48 @@ export const doctorService = {
    */
   searchDoctors: async (query: string): Promise<Doctor[]> => {
     const response = await apiClient.get<Doctor[]>(`${API_ENDPOINTS.DOCTORS.LIST}?search=${query}`);
+
+    return response.data;
+  },
+
+  /**
+   * Admin: Create a new doctor with user account
+   */
+  createDoctor: async (doctorData: CreateDoctorRequest): Promise<Doctor> => {
+    const response = await apiClient.post<Doctor>(
+      API_ENDPOINTS.DOCTORS.CREATE,
+      doctorData
+    );
+
+    return response.data;
+  },
+
+  /**
+   * Admin: Update doctor status (activate/deactivate)
+   */
+  updateDoctorStatus: async (
+    doctorId: number,
+    statusUpdate: UpdateDoctorStatusRequest
+  ): Promise<Doctor> => {
+    const response = await apiClient.patch<Doctor>(
+      `${API_ENDPOINTS.DOCTORS.GET(doctorId)}/status`,
+      statusUpdate
+    );
+
+    return response.data;
+  },
+
+  /**
+   * Admin: Assign branches to doctor
+   */
+  assignDoctorBranches: async (
+    doctorId: number,
+    branchesData: AssignDoctorBranchesRequest
+  ): Promise<Doctor> => {
+    const response = await apiClient.post<Doctor>(
+      `${API_ENDPOINTS.DOCTORS.GET(doctorId)}/branches`,
+      branchesData
+    );
 
     return response.data;
   },
