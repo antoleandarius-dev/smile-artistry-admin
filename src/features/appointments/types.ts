@@ -55,3 +55,52 @@ export interface AppointmentFilters {
   patient_id?: number;
   status_filter?: AppointmentStatus;
 }
+
+// Tele-consultation types
+export interface TeleSession {
+  id: number;
+  appointment_id: number;
+  status: TeleSessionStatus;
+  join_url?: string;
+  created_at: string;
+  started_at?: string;
+  ended_at?: string;
+}
+
+export interface StartTeleSessionRequest {
+  appointment_id: number;
+}
+
+export interface StartTeleSessionResponse {
+  session: {
+    id: number;
+    appointment_id: number;
+    provider: string;
+    meeting_id: string;
+    start_time: string;
+    end_time: string | null;
+    duration_minutes: number | null;
+  };
+  join_token: {
+    token: string;
+    meeting_id: string;
+    expires_at: string;
+  };
+}
+
+export interface JoinTeleSessionResponse {
+  session: {
+    id: number;
+    appointment_id: number;
+    provider: string;
+    meeting_id: string;
+    start_time: string;
+    end_time: string | null;
+    duration_minutes: number | null;
+  };
+  join_token: {
+    token: string;
+    meeting_id: string;
+    expires_at: string;
+  };
+}

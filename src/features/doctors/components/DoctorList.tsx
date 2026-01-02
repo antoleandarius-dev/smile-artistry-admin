@@ -38,7 +38,7 @@ const DoctorList = ({ doctors, isLoading, error, onSelectDoctor }: DoctorListPro
     return doctors.filter((doctor) => {
       const query = searchQuery.toLowerCase();
       return (
-        doctor.name.toLowerCase().includes(query) ||
+        (doctor.name?.toLowerCase().includes(query) ?? false) ||
         (doctor.specialization?.toLowerCase().includes(query) ?? false)
       );
     });

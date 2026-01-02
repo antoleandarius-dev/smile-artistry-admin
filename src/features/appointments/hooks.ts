@@ -10,6 +10,7 @@ import type {
   AppointmentFilters,
   CreateAppointmentRequest,
   RescheduleAppointmentRequest,
+  StartTeleSessionRequest,
 } from './types';
 
 // Query keys
@@ -21,6 +22,8 @@ export const appointmentKeys = {
   detail: (id: number) => [...appointmentKeys.details(), id] as const,
   patients: ['patients'] as const,
   users: ['users'] as const,
+  teleSessions: () => [...appointmentKeys.all, 'tele-session'] as const,
+  teleSession: (id: number) => [...appointmentKeys.teleSessions(), id] as const,
 };
 
 /**
@@ -118,5 +121,43 @@ export const useUsers = () => {
   return useQuery({
     queryKey: appointmentKeys.users,
     queryFn: () => appointmentService.getUsers(),
+  });
+};
+
+/**
+ * Hook to start a tele-consultation session
+ */
+export const useStartTeleSession = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: StartTeleSessionRequest) =>
+      appointmentService.startTeleSession(data),
+    onSuccess: (_, variables) => {
+      // Invalidate appointment lists to refetch with updated session status
+      queryClient.invalidateQueries({ queryKey: appointmentKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: appointmentKeys.detail(variables.appointment_id) });
+    },
+  });
+};
+
+/**
+ * Hook to fetch tele-session details
+ */
+export const useTeleSession = (sessionId: number | null) => {
+  return useQuery({
+    queryKey: appointmentKeys.teleSession(sessionId || 0),
+    queryFn: () => appointmentService.getTeleSession(sessionId!),
+    enabled: !!sessionId,
+  });
+};
+
+/**
+ * Hook to join a tele-consultation session
+ */
+export const useJoinTeleSession = () => {
+  return useMutation({
+    mutationFn: (sessionId: number) =>
+      appointmentService.joinTeleSession(sessionId),
   });
 };

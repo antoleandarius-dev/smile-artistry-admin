@@ -12,6 +12,10 @@ import type {
   Patient,
   Doctor,
   User,
+  TeleSession,
+  StartTeleSessionRequest,
+  StartTeleSessionResponse,
+  JoinTeleSessionResponse,
 } from './types';
 
 export const appointmentService = {
@@ -105,6 +109,35 @@ export const appointmentService = {
    */
   getUsers: async (): Promise<User[]> => {
     const response = await apiClient.get<User[]>(API_ENDPOINTS.USERS.LIST);
+    return response.data;
+  },
+
+  /**
+   * Start a tele-consultation session for an appointment
+   */
+  startTeleSession: async (data: StartTeleSessionRequest): Promise<StartTeleSessionResponse> => {
+    const response = await apiClient.post<StartTeleSessionResponse>(
+      API_ENDPOINTS.TELE_SESSIONS.START,
+      data
+    );
+    return response.data;
+  },
+
+  /**
+   * Get tele-session details
+   */
+  getTeleSession: async (sessionId: number): Promise<TeleSession> => {
+    const response = await apiClient.get<TeleSession>(API_ENDPOINTS.TELE_SESSIONS.GET(sessionId));
+    return response.data;
+  },
+
+  /**
+   * Join a tele-consultation session
+   */
+  joinTeleSession: async (sessionId: number): Promise<JoinTeleSessionResponse> => {
+    const response = await apiClient.get<JoinTeleSessionResponse>(
+      API_ENDPOINTS.TELE_SESSIONS.JOIN(sessionId)
+    );
     return response.data;
   },
 };

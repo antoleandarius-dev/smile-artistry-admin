@@ -27,6 +27,8 @@ import {
 } from '@mui/icons-material';
 import type { Appointment, AppointmentType, AppointmentStatus } from '../types';
 import { usePatients, useDoctors, useUsers } from '../hooks';
+import TeleConsultActions from './TeleConsultActions';
+import SessionStatus from './SessionStatus';
 import { format, parseISO } from 'date-fns';
 
 interface AppointmentListProps {
@@ -177,6 +179,7 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
                 <TableCell>Time</TableCell>
                 <TableCell>Type</TableCell>
                 <TableCell>Status</TableCell>
+                <TableCell>Session Status</TableCell>
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -205,31 +208,43 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
                         color={getStatusColor(appointment.status)}
                       />
                     </TableCell>
+                    <TableCell>
+                      <SessionStatus appointment={appointment} />
+                    </TableCell>
                     <TableCell align="right">
-                      <Tooltip title={canModify ? "Reschedule" : "Cannot reschedule"}>
-                        <span>
-                          <IconButton
-                            size="small"
-                            onClick={() => onReschedule(appointment)}
-                            disabled={!canModify}
-                            color="primary"
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                      <Tooltip title={canModify ? "Cancel appointment" : "Cannot cancel"}>
-                        <span>
-                          <IconButton
-                            size="small"
-                            onClick={() => onCancel(appointment)}
-                            disabled={!canModify}
-                            color="error"
-                          >
-                            <CancelIcon fontSize="small" />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
+                      {/* Tele-consult actions for tele appointments */}
+                      {appointment.appointment_type === 'tele' && (
+                        <Box sx={{ mb: 1 }}>
+                          <TeleConsultActions appointment={appointment} />
+                        </Box>
+                      )}
+                      {/* Standard appointment actions */}
+                      <Box>
+                        <Tooltip title={canModify ? "Reschedule" : "Cannot reschedule"}>
+                          <span>
+                            <IconButton
+                              size="small"
+                              onClick={() => onReschedule(appointment)}
+                              disabled={!canModify}
+                              color="primary"
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                        <Tooltip title={canModify ? "Cancel appointment" : "Cannot cancel"}>
+                          <span>
+                            <IconButton
+                              size="small"
+                              onClick={() => onCancel(appointment)}
+                              disabled={!canModify}
+                              color="error"
+                            >
+                              <CancelIcon fontSize="small" />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 );
