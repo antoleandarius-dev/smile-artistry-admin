@@ -3,12 +3,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import MainLayout from './layouts/MainLayout';
 import ProtectedRoute from './shared/components/ProtectedRoute';
+import AdminProtectedRoute from './shared/components/AdminProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import AppointmentsPage from './pages/AppointmentsPage';
 import PatientsPage from './pages/PatientsPage';
 import DoctorsPage from './pages/DoctorsPage';
 import AdminDoctorsPage from './pages/AdminDoctorsPage';
+import AdminUsersPage from './pages/AdminUsersPage';
 import RecordsPage from './pages/RecordsPage';
 
 const queryClient = new QueryClient();
@@ -70,11 +72,21 @@ function App() {
             <Route
               path="/admin/doctors"
               element={
-                <ProtectedRoute>
+                <AdminProtectedRoute>
                   <MainLayout>
                     <AdminDoctorsPage />
                   </MainLayout>
-                </ProtectedRoute>
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <AdminProtectedRoute>
+                  <MainLayout>
+                    <AdminUsersPage />
+                  </MainLayout>
+                </AdminProtectedRoute>
               }
             />
             <Route

@@ -39,3 +39,7 @@ export const getUserData = (): UserData | null => {
 export const logout = (): void => {
   removeAuthToken();
 };
+
+export const getCurrentUser = (): UserData | null => {
+  return getUserData();
+};

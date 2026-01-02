@@ -15,10 +15,11 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import PeopleIcon from '@mui/icons-material/People';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import SecurityIcon from '@mui/icons-material/Security';
 import FolderIcon from '@mui/icons-material/Folder';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { logout } from '../shared/utils/auth';
+import { logout, getCurrentUser } from '../shared/utils/auth';
 
 const DRAWER_WIDTH = 240;
 
@@ -30,6 +31,7 @@ interface SidebarProps {
 const Sidebar = ({ open, onClose }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const currentUser = getCurrentUser();
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -51,7 +53,11 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
 
   const adminMenuItems = [
     { text: 'Doctor Management', icon: <ManageAccountsIcon />, path: '/admin/doctors' },
+    { text: 'Users & Roles', icon: <SecurityIcon />, path: '/admin/users' },
   ];
+
+  // Check if current user is admin
+  const isAdmin = currentUser?.role === 'admin';
 
   return (
     <Drawer
@@ -81,25 +87,29 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
           </ListItem>
         ))}
       </List>
-      <Divider />
-      <Box sx={{ px: 2, py: 1.5 }}>
-        <Typography variant="caption" sx={{ fontWeight: 600, textTransform: 'uppercase', color: 'text.secondary' }}>
-          Admin
-        </Typography>
-      </Box>
-      <List>
-        {adminMenuItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton 
-              onClick={() => handleNavigation(item.path)}
-              selected={location.pathname === item.path}
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+      {isAdmin && (
+        <>
+          <Divider />
+          <Box sx={{ px: 2, py: 1.5 }}>
+            <Typography variant="caption" sx={{ fontWeight: 600, textTransform: 'uppercase', color: 'text.secondary' }}>
+              Admin
+            </Typography>
+          </Box>
+          <List>
+            {adminMenuItems.map((item) => (
+              <ListItem key={item.text} disablePadding>
+                <ListItemButton 
+                  onClick={() => handleNavigation(item.path)}
+                  selected={location.pathname === item.path}
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </>
+      )}
       <Divider />
       <List>
         <ListItem disablePadding>
