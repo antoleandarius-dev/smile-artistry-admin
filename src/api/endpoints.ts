@@ -97,6 +97,8 @@ export const API_ENDPOINTS = {
     GET: (id: number) => `/tele-sessions/${id}`,
     JOIN: (id: number) => `/tele-sessions/${id}/join`,
     END: (id: number) => `/tele-sessions/${id}/end`,
+    ADMIN_LIST: '/tele-sessions/admin/list',
+    ADMIN_BY_APPOINTMENT: (appointmentId: number) => `/tele-sessions/admin/appointment/${appointmentId}`,
   },
 
   // Migrated Records
