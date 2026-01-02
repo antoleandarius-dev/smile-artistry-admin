@@ -16,6 +16,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import SecurityIcon from '@mui/icons-material/Security';
+import BusinessIcon from '@mui/icons-material/Business';
 import FolderIcon from '@mui/icons-material/Folder';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -54,6 +55,7 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
   const adminMenuItems = [
     { text: 'Doctor Management', icon: <ManageAccountsIcon />, path: '/admin/doctors' },
     { text: 'Users & Roles', icon: <SecurityIcon />, path: '/admin/users' },
+    { text: 'Branch Management', icon: <BusinessIcon />, path: '/admin/branches' },
   ];
 
   // Check if current user is admin

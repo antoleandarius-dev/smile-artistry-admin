@@ -31,6 +31,12 @@ export const API_ENDPOINTS = {
     CREATE: '/branches/',
     GET: (id: number) => `/branches/${id}`,
     UPDATE: (id: number) => `/branches/${id}`,
+    ACTIVATE: (id: number) => `/branches/${id}/activate`,
+    DEACTIVATE: (id: number) => `/branches/${id}/deactivate`,
+    ASSIGN_USER: (id: number) => `/branches/${id}/assign-user`,
+    UNASSIGN_USER: (id: number) => `/branches/${id}/unassign-user`,
+    ASSIGN_DOCTOR: (id: number) => `/branches/${id}/assign-doctor`,
+    UNASSIGN_DOCTOR: (id: number) => `/branches/${id}/unassign-doctor`,
   },
 
   // User Branches

@@ -11,6 +11,7 @@ import PatientsPage from './pages/PatientsPage';
 import DoctorsPage from './pages/DoctorsPage';
 import AdminDoctorsPage from './pages/AdminDoctorsPage';
 import AdminUsersPage from './pages/AdminUsersPage';
+import AdminBranchesPage from './pages/AdminBranchesPage';
 import RecordsPage from './pages/RecordsPage';
 
 const queryClient = new QueryClient();
@@ -85,6 +86,16 @@ function App() {
                 <AdminProtectedRoute>
                   <MainLayout>
                     <AdminUsersPage />
+                  </MainLayout>
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/branches"
+              element={
+                <AdminProtectedRoute>
+                  <MainLayout>
+                    <AdminBranchesPage />
                   </MainLayout>
                 </AdminProtectedRoute>
               }
