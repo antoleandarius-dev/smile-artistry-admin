@@ -5,7 +5,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { appointmentService } from './appointment.service';
-import { useDoctors as useSharedDoctors } from '../doctors';
 import type {
   AppointmentFilters,
   CreateAppointmentRequest,
@@ -94,24 +93,6 @@ export const useCancelAppointment = () => {
       queryClient.invalidateQueries({ queryKey: appointmentKeys.lists() });
     },
   });
-};
-
-/**
- * Hook to fetch all patients
- */
-export const usePatients = () => {
-  return useQuery({
-    queryKey: appointmentKeys.patients,
-    queryFn: () => appointmentService.getPatients(),
-  });
-};
-
-/**
- * Hook to fetch all doctors (uses shared doctor hook from doctors feature)
- * @deprecated Use useDoctors from '../doctors' feature directly instead
- */
-export const useDoctors = () => {
-  return useSharedDoctors();
 };
 
 /**

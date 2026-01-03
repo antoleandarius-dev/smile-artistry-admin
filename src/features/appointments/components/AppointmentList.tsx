@@ -26,10 +26,12 @@ import {
   VideoCall as VideoCallIcon,
 } from '@mui/icons-material';
 import type { Appointment, AppointmentType, AppointmentStatus } from '../types';
-import { usePatients, useDoctors, useUsers } from '../hooks';
+import { useUsers } from '../hooks';
 import TeleConsultActions from './TeleConsultActions';
 import SessionStatus from './SessionStatus';
 import { format, parseISO } from 'date-fns';
+import { usePatients } from '../../patients';
+import { useDoctors } from '../../doctors';
 
 interface AppointmentListProps {
   appointments: Appointment[];

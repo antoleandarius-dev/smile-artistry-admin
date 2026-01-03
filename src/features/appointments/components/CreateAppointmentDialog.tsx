@@ -16,8 +16,10 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { useCreateAppointment, usePatients, useDoctors, useUsers } from '../hooks';
+import { useCreateAppointment, useUsers } from '../hooks';
 import type { AppointmentType } from '../types';
+import { usePatients } from '../../patients';
+import { useDoctors } from '../../doctors';
 
 interface CreateAppointmentDialogProps {
   open: boolean;

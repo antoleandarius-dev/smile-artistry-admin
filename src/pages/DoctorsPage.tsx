@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Box, Typography, Grid, Paper, CircularProgress } from '@mui/material';
-import { DoctorList, DoctorDetail, DoctorAvailability, useDoctors, useDoctor, useDoctorAvailability } from '../features/doctors';
+import { Box, Typography, Grid, Paper } from '@mui/material';
+import { DoctorList, type DoctorDetail, DoctorAvailability, useDoctors, useDoctor, useDoctorAvailability } from '../features/doctors';
 import type { Doctor } from '../features/doctors';
 
 const DoctorsPage = () => {
