@@ -61,7 +61,8 @@ const AssignRoleDialog: React.FC<AssignRoleDialogProps> = ({
   };
 
   // Filter out doctor role
-  const availableRoles = roles.filter((role) => role.name !== 'doctor');
+  // Doctor assignment is handled separately in the doctor management section
+  const availableRoles = roles.filter((role) => role.name !== 'doctor' && role.name !== 'patient');
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>

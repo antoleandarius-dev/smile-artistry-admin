@@ -57,10 +57,10 @@ export const API_ENDPOINTS = {
 
   // Patients
   PATIENTS: {
-    LIST: '/patients/',
-    CREATE: '/patients/',
-    GET: (id: number) => `/patients/${id}`,
-    UPDATE: (id: number) => `/patients/${id}`,
+    LIST: '/admin/patients/',
+    CREATE: '/admin/patients/',
+    GET: (id: number) => `/admin/patients/${id}`,
+    UPDATE: (id: number) => `/admin/patients/${id}`,
     TIMELINE: (id: number) => `/patients/${id}/timeline`,
     MY_TIMELINE: '/patients/my-timeline',
   },

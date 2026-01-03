@@ -31,8 +31,8 @@ export const patientService = {
       ? `${API_ENDPOINTS.PATIENTS.LIST}?${params.toString()}`
       : API_ENDPOINTS.PATIENTS.LIST;
 
-    const response = await apiClient.get<Patient[]>(url);
-    return response.data;
+    const response = await apiClient.get<{ patients: Patient[]; total: number; skip: number; limit: number }>(url);
+    return response.data.patients;
   },
 
   /**
