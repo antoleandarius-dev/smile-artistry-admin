@@ -142,3 +142,15 @@ export const useJoinTeleSession = () => {
       appointmentService.joinTeleSession(sessionId),
   });
 };
+
+/**
+ * Hook to fetch tele-session by appointment ID
+ * Useful for checking if a session has already been started
+ */
+export const useTeleSessionByAppointment = (appointmentId: number | null) => {
+  return useQuery({
+    queryKey: appointmentKeys.teleSession(appointmentId || 0),
+    queryFn: () => appointmentService.getTeleSessionByAppointment(appointmentId!),
+    enabled: !!appointmentId,
+  });
+};

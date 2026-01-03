@@ -3,7 +3,7 @@
  * Handles Start and Join tele-consultation actions
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -14,8 +14,8 @@ import {
 } from '@mui/material';
 import { VideoCall as VideoCallIcon } from '@mui/icons-material';
 import MuiAlert from '@mui/material/Alert';
-import type { Appointment } from '../types';
-import { useStartTeleSession, useJoinTeleSession } from '../hooks';
+import type { Appointment, TeleSessionJoinToken } from '../types';
+import { useStartTeleSession, useJoinTeleSession, useTeleSessionByAppointment } from '../hooks';
 import { getUserData } from '../../../shared/utils/auth';
 import { useToast } from '../../../shared/hooks/useToast';
 
@@ -33,10 +33,26 @@ const TeleConsultActions: React.FC<TeleConsultActionsProps> = ({
   const userData = getUserData();
   const [error, setError] = useState<string | null>(null);
   const [sessionStarted, setSessionStarted] = useState(false);
+  const [sessionId, setSessionId] = useState<number | null>(null);
   const { showToast, open, toast, handleClose } = useToast();
 
   const startSessionMutation = useStartTeleSession();
   const joinSessionMutation = useJoinTeleSession();
+  
+  // Fetch tele session for this appointment to check if one already exists
+  const { data: existingSession, isLoading: isCheckingSession } = useTeleSessionByAppointment(
+    appointment.id
+  );
+
+  // Update session state when fetching existing session data
+  // Must be called before early returns to follow React Hook rules
+  useEffect(() => {
+    if (existingSession) {
+      setSessionId(existingSession.id);
+      // Consider session as "started" if it exists and is not pending
+      setSessionStarted(existingSession.status !== 'pending');
+    }
+  }, [existingSession]);
 
   const userRole = userData?.role || '';
   const isDoctor = userRole === 'doctor' || userRole === 'admin';
@@ -60,25 +76,22 @@ const TeleConsultActions: React.FC<TeleConsultActionsProps> = ({
       
       console.log('Start session response:', response);
       
-      // Construct join URL from Zoom session data
-      const { session, join_token } = response;
+      // Get the start_url from the backend response
+      const { start_url, session } = response;
       
-      if (!session || !join_token) {
-        throw new Error('Invalid session response from server');
+      if (!start_url) {
+        throw new Error('No start URL provided - unable to initialize consultation');
       }
 
-      // Construct the Zoom join URL with the token
-      // Format: https://your-domain.zoom.us/wc/join/MEETING_ID?t=TOKEN
-      const joinUrl = `https://zoom.us/wc/join/${encodeURIComponent(session.meeting_id)}?pwd=${encodeURIComponent(join_token.token)}`;
-
-      console.log('Opening tele session URL:', joinUrl);
+      console.log('Opening tele session URL:', start_url);
 
       setSessionStarted(true);
-      onSessionStarted?.(joinUrl);
+      onSessionStarted?.(start_url);
       showToast('Consultation session started successfully', 'success');
       
       // Open session in new tab/window with error handling
-      const newWindow = window.open(joinUrl, '_blank', 'width=1280,height=720');
+      // The start_url is a Zoom-signed URL that identifies the doctor as the host
+      const newWindow = window.open(start_url, '_blank', 'width=1280,height=720');
       if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
         showToast('Unable to open session window. Please check browser popup settings.', 'warning');
       }
@@ -94,20 +107,17 @@ const TeleConsultActions: React.FC<TeleConsultActionsProps> = ({
   const handleJoinConsultation = async () => {
     try {
       setError(null);
-      // Assuming session_id is stored or can be derived from appointment
-      // For now, we'll pass the appointment_id as session_id
-      // Backend should handle the mapping
-      const response = await joinSessionMutation.mutateAsync(appointment.id);
       
-      // Construct join URL from Zoom session data
-      const { session, join_token } = response;
+      // If we have an existing session ID, use it; otherwise use appointment ID
+      const idToUse = sessionId || appointment.id;
+      const joinToken: TeleSessionJoinToken = await joinSessionMutation.mutateAsync(idToUse);
       
-      if (!session || !join_token) {
+      if (!joinToken.token || !joinToken.meeting_id) {
         throw new Error('Invalid session response from server');
       }
 
       // Construct the Zoom join URL with the token
-      const joinUrl = `https://zoom.us/wc/join/${encodeURIComponent(session.meeting_id)}?pwd=${encodeURIComponent(join_token.token)}`;
+      const joinUrl = `https://zoom.us/wc/join/${encodeURIComponent(joinToken.meeting_id)}?pwd=${encodeURIComponent(joinToken.token)}`;
 
       console.log('Opening tele session URL:', joinUrl);
 
@@ -128,7 +138,7 @@ const TeleConsultActions: React.FC<TeleConsultActionsProps> = ({
     }
   };
 
-  const isLoading = startSessionMutation.isPending || joinSessionMutation.isPending;
+  const isLoading = startSessionMutation.isPending || joinSessionMutation.isPending || isCheckingSession;
 
   return (
     <Box>

@@ -81,6 +81,7 @@ export interface StartTeleSessionResponse {
     end_time: string | null;
     duration_minutes: number | null;
   };
+  start_url: string | null;  // Zoom start URL for host (doctor only)
   join_token: {
     token: string;
     meeting_id: string;
@@ -103,4 +104,10 @@ export interface JoinTeleSessionResponse {
     meeting_id: string;
     expires_at: string;
   };
+}
+export interface TeleSessionJoinToken {
+  token: string;
+  meeting_id: string;
+  join_url?: string;
+  expires_at: string;
 }
