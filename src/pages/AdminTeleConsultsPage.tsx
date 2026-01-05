@@ -5,7 +5,7 @@ import {
   CardContent,
   Alert,
 } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
   TeleSessionAdminResponse,
   TeleSessionListParams,
@@ -20,6 +20,7 @@ import TeleConsultTable from '../features/tele-consults/components/TeleConsultTa
 import TeleConsultDetailView from '../features/tele-consults/components/TeleConsultDetailView';
 
 const AdminTeleConsultsPage: React.FC = () => {
+  const queryClient = useQueryClient();
   const [filters, setFilters] = useState<TeleConsultFiltersState>({
     startDate: '',
     endDate: '',
@@ -90,6 +91,16 @@ const AdminTeleConsultsPage: React.FC = () => {
     setDetailsOpen(true);
   };
 
+  const handleStatusUpdated = (updatedSession: TeleSessionAdminResponse) => {
+    // Update selected session with new data
+    setSelectedSession(updatedSession);
+    
+    // Invalidate the sessions list query to refresh data
+    queryClient.invalidateQueries({ 
+      queryKey: ['tele-sessions-admin']
+    });
+  };
+
   const handlePageChange = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -142,6 +153,7 @@ const AdminTeleConsultsPage: React.FC = () => {
           setDetailsOpen(false);
           setSelectedSession(null);
         }}
+        onStatusUpdated={handleStatusUpdated}
       />
     </Box>
   );

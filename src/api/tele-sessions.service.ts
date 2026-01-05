@@ -67,4 +67,16 @@ export const teleSessionsService = {
     );
     return response.data;
   },
+
+  /**
+   * Check Zoom meeting status and update session if meeting has ended (admin only)
+   */
+  async checkSessionStatus(
+    sessionId: number
+  ): Promise<TeleSessionAdminResponse> {
+    const response = await apiClient.post<TeleSessionAdminResponse>(
+      `${API_ENDPOINTS.TELE_SESSIONS.ADMIN(sessionId)}/check-status`
+    );
+    return response.data;
+  },
 };

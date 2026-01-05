@@ -99,6 +99,7 @@ export const API_ENDPOINTS = {
     END: (id: number) => `/tele-sessions/${id}/end`,
     BY_APPOINTMENT: (appointmentId: number) => `/tele-sessions/appointment/${appointmentId}`,
     ADMIN_LIST: '/tele-sessions/admin/list',
+    ADMIN: (id: number) => `/tele-sessions/admin/${id}`,
     ADMIN_BY_APPOINTMENT: (appointmentId: number) => `/tele-sessions/admin/appointment/${appointmentId}`,
   },
 

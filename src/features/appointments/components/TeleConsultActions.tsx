@@ -1,6 +1,6 @@
 /**
  * TeleConsultActions Component
- * Handles Start and Join tele-consultation actions
+ * Handles Start, Join, and Check Status tele-consultation actions
  */
 
 import { useState, useEffect } from 'react';
@@ -12,12 +12,14 @@ import {
   Alert,
   Snackbar,
 } from '@mui/material';
-import { VideoCall as VideoCallIcon } from '@mui/icons-material';
+import { VideoCall as VideoCallIcon, Refresh as RefreshIcon } from '@mui/icons-material';
 import MuiAlert from '@mui/material/Alert';
+import { useMutation } from '@tanstack/react-query';
 import type { Appointment, TeleSessionJoinToken } from '../types';
 import { useStartTeleSession, useJoinTeleSession, useTeleSessionByAppointment } from '../hooks';
 import { getUserData } from '../../../shared/utils/auth';
 import { useToast } from '../../../shared/hooks/useToast';
+import { teleSessionsService } from '../../../api/tele-sessions.service';
 
 interface TeleConsultActionsProps {
   appointment: Appointment;
@@ -34,15 +36,33 @@ const TeleConsultActions: React.FC<TeleConsultActionsProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [sessionStarted, setSessionStarted] = useState(false);
   const [sessionId, setSessionId] = useState<number | null>(null);
+  const [showConfirmStartDialog, setShowConfirmStartDialog] = useState(false);
   const { showToast, open, toast, handleClose } = useToast();
 
   const startSessionMutation = useStartTeleSession();
   const joinSessionMutation = useJoinTeleSession();
   
   // Fetch tele session for this appointment to check if one already exists
-  const { data: existingSession, isLoading: isCheckingSession } = useTeleSessionByAppointment(
+  const { data: existingSession, isLoading: isCheckingSession, refetch: refetchSession } = useTeleSessionByAppointment(
     appointment.id
   );
+
+  // Mutation for checking status
+  const checkStatusMutation = useMutation({
+    mutationFn: async () => {
+      if (!sessionId) throw new Error('No session to check');
+      return await teleSessionsService.checkSessionStatus(sessionId);
+    },
+    onSuccess: () => {
+      showToast('Status checked successfully!', 'success');
+      // Refetch session data to update UI
+      refetchSession();
+    },
+    onError: (error) => {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to check status';
+      showToast(errorMessage, 'error');
+    },
+  });
 
   // Update session state when fetching existing session data
   // Must be called before early returns to follow React Hook rules
@@ -104,6 +124,11 @@ const TeleConsultActions: React.FC<TeleConsultActionsProps> = ({
     }
   };
 
+  const handleConfirmStartConsultation = () => {
+    setShowConfirmStartDialog(false);
+    handleStartConsultation();
+  };
+
   const handleJoinConsultation = async () => {
     try {
       setError(null);
@@ -138,7 +163,7 @@ const TeleConsultActions: React.FC<TeleConsultActionsProps> = ({
     }
   };
 
-  const isLoading = startSessionMutation.isPending || joinSessionMutation.isPending || isCheckingSession;
+  const isLoading = startSessionMutation.isPending || joinSessionMutation.isPending || isCheckingSession || checkStatusMutation.isPending;
 
   return (
     <Box>
@@ -157,7 +182,7 @@ const TeleConsultActions: React.FC<TeleConsultActionsProps> = ({
                 variant="contained"
                 color="primary"
                 startIcon={<VideoCallIcon />}
-                onClick={handleStartConsultation}
+                onClick={() => setShowConfirmStartDialog(true)}
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -197,7 +222,163 @@ const TeleConsultActions: React.FC<TeleConsultActionsProps> = ({
             </span>
           </Tooltip>
         )}
+
+        {/* Check Status button (for admin, if session exists) */}
+        {isDoctor && sessionStarted && (
+          <Tooltip title="Check Zoom meeting status and update if ended">
+            <span>
+              <Button
+                size="small"
+                variant="outlined"
+                color="secondary"
+                startIcon={checkStatusMutation.isPending ? <CircularProgress size={16} /> : <RefreshIcon />}
+                onClick={() => checkStatusMutation.mutate()}
+                disabled={isLoading}
+              >
+                {checkStatusMutation.isPending ? 'Checking...' : 'Check Status'}
+              </Button>
+            </span>
+          </Tooltip>
+        )}
       </Box>
+      
+      {/* Confirmation Dialog for Starting Consultation */}
+      {showConfirmStartDialog && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1300,
+            padding: '16px',
+          }}
+          onClick={() => setShowConfirmStartDialog(false)}
+        >
+          <Box
+            sx={{
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
+              maxWidth: '500px',
+              width: '100%',
+              animation: 'slideUp 0.3s ease',
+              '@keyframes slideUp': {
+                from: {
+                  opacity: 0,
+                  transform: 'translateY(20px)',
+                },
+                to: {
+                  opacity: 1,
+                  transform: 'translateY(0)',
+                },
+              },
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '20px',
+                borderBottom: '1px solid #e0e0e0',
+              }}
+            >
+              <Box sx={{ fontSize: '18px', fontWeight: 600, color: '#333' }}>
+                Start Consultation?
+              </Box>
+              <Button
+                onClick={() => setShowConfirmStartDialog(false)}
+                sx={{
+                  minWidth: 'auto',
+                  padding: '0',
+                  color: '#999',
+                  '&:hover': { backgroundColor: '#f5f5f5', color: '#333' },
+                }}
+              >
+                ✕
+              </Button>
+            </Box>
+
+            {/* Body */}
+            <Box sx={{ padding: '20px' }}>
+              <Box sx={{ fontSize: '14px', fontWeight: 500, color: '#555', marginBottom: '12px' }}>
+                Before starting the consultation, please ensure:
+              </Box>
+              <Box component="ul" sx={{ margin: '8px 0 0 0', paddingLeft: '20px', listStyle: 'none' }}>
+                {[
+                  'Your camera and microphone are working properly',
+                  'You have a stable internet connection',
+                  'You are in a private location suitable for patient consultation',
+                  'You have appropriate lighting for the video call',
+                  'Your patient has been informed about the consultation timing',
+                ].map((item, idx) => (
+                  <Box
+                    component="li"
+                    key={idx}
+                    sx={{
+                      fontSize: '13px',
+                      color: '#666',
+                      lineHeight: '1.6',
+                      margin: '6px 0',
+                      position: 'relative',
+                      paddingLeft: '20px',
+                      '&:before': {
+                        content: '"✓"',
+                        position: 'absolute',
+                        left: '0',
+                        color: '#1976d2',
+                        fontWeight: 'bold',
+                      },
+                    }}
+                  >
+                    {item}
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+
+            {/* Footer */}
+            <Box
+              sx={{
+                display: 'flex',
+                gap: '12px',
+                padding: '16px 20px',
+                borderTop: '1px solid #e0e0e0',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <Button
+                onClick={() => setShowConfirmStartDialog(false)}
+                variant="outlined"
+                sx={{
+                  color: '#333',
+                  borderColor: '#d0d0d0',
+                  '&:hover': { backgroundColor: '#e0e0e0', borderColor: '#999' },
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleConfirmStartConsultation}
+                variant="contained"
+                color="primary"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Starting...' : 'Start Consultation'}
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      )}
+
       <Snackbar
         open={open}
         autoHideDuration={toast.duration || 4000}

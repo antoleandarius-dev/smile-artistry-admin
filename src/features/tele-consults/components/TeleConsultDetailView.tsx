@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -10,13 +10,17 @@ import {
   Box,
   Paper,
   Divider,
+  CircularProgress,
 } from '@mui/material';
+import { useMutation } from '@tanstack/react-query';
 import type { TeleSessionAdminResponse } from '../../../api/tele-sessions.service';
+import { teleSessionsService } from '../../../api/tele-sessions.service';
 
 interface TeleConsultDetailViewProps {
   session: TeleSessionAdminResponse | null;
   open: boolean;
   onClose: () => void;
+  onStatusUpdated?: (updatedSession: TeleSessionAdminResponse) => void;
 }
 
 const formatDate = (dateString: string | null): string => {
@@ -44,7 +48,32 @@ const TeleConsultDetailView: React.FC<TeleConsultDetailViewProps> = ({
   session,
   open,
   onClose,
+  onStatusUpdated,
 }) => {
+  const [statusCheckMessage, setStatusCheckMessage] = useState<string | null>(null);
+
+  // Mutation for checking status
+  const checkStatusMutation = useMutation({
+    mutationFn: async () => {
+      if (!session) throw new Error('No session selected');
+      return await teleSessionsService.checkSessionStatus(session.id);
+    },
+    onSuccess: (updatedSession) => {
+      setStatusCheckMessage('Status checked successfully!');
+      if (onStatusUpdated) {
+        onStatusUpdated(updatedSession);
+      }
+      // Clear message after 3 seconds
+      setTimeout(() => setStatusCheckMessage(null), 3000);
+    },
+    onError: (error) => {
+      setStatusCheckMessage(
+        `Error checking status: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+      setTimeout(() => setStatusCheckMessage(null), 5000);
+    },
+  });
+
   if (!session) return null;
 
   const calculateDuration = () => {
@@ -57,6 +86,9 @@ const TeleConsultDetailView: React.FC<TeleConsultDetailViewProps> = ({
     const diffMins = Math.round(diffMs / 60000);
     return `${diffMins} minutes`;
   };
+
+  const isCompleted = session.status === 'completed';
+  const isLoading = checkStatusMutation.isPending;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -190,9 +222,33 @@ const TeleConsultDetailView: React.FC<TeleConsultDetailViewProps> = ({
               join or modify sessions from here.
             </Typography>
           </Paper>
+
+          {/* Status Check Message */}
+          {statusCheckMessage && (
+            <Paper
+              sx={{
+                p: 2,
+                backgroundColor: statusCheckMessage.includes('Error') ? '#ffebee' : '#e8f5e9',
+                border: `1px solid ${statusCheckMessage.includes('Error') ? '#ef5350' : '#4caf50'}`,
+              }}
+            >
+              <Typography variant="caption" color={statusCheckMessage.includes('Error') ? 'error' : 'success'}>
+                {statusCheckMessage}
+              </Typography>
+            </Paper>
+          )}
         </Box>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ gap: 1, p: 2 }}>
+        <Button
+          onClick={() => checkStatusMutation.mutate()}
+          variant="contained"
+          color="primary"
+          disabled={isLoading || isCompleted}
+          startIcon={isLoading ? <CircularProgress size={20} /> : undefined}
+        >
+          {isLoading ? 'Checking...' : 'Check Status'}
+        </Button>
         <Button onClick={onClose}>Close</Button>
       </DialogActions>
     </Dialog>
