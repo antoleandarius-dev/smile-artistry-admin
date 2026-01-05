@@ -20,10 +20,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Typography,
 } from '@mui/material';
 import {
   Edit as EditIcon,
-  Delete as DeleteIcon,
   PersonAdd as PersonAddIcon,
   LocalHospital as DoctorIcon,
   Add as AddIcon,
@@ -37,6 +37,7 @@ import EditBranchDialog from '../features/branches/EditBranchDialog';
 import AssignUsersDialog from '../features/branches/AssignUsersDialog';
 import AssignDoctorsDialog from '../features/branches/AssignDoctorsDialog';
 import DeactivateBranchDialog from '../features/branches/DeactivateBranchDialog';
+import { RESPONSIVE_PATTERNS } from '../styles/responsive';
 
 const AdminBranchesPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -65,14 +66,6 @@ const AdminBranchesPage: React.FC = () => {
   // Mutation for activating branch
   const activateBranchMutation = useMutation({
     mutationFn: (branchId: number) => branchService.activateBranch(branchId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['branches'] });
-    },
-  });
-
-  // Mutation for deactivating branch
-  const deactivateBranchMutation = useMutation({
-    mutationFn: (branchId: number) => branchService.deactivateBranch(branchId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['branches'] });
     },
@@ -124,43 +117,63 @@ const AdminBranchesPage: React.FC = () => {
 
   if (branchesLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: { xs: 300, sm: 400 }, p: { xs: 2, sm: 3 } }}>
         <CircularProgress />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Branch Management</h1>
+    <Box sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
+      <Box sx={RESPONSIVE_PATTERNS.headerLayout}>
+        <Typography 
+          variant="h4"
+          sx={{
+            fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' },
+          }}
+        >
+          Branch Management
+        </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={handleAddBranchClick}
+          sx={{
+            width: { xs: '100%', sm: 'auto' },
+            minHeight: { xs: 44, md: 40 },
+          }}
         >
           Add Branch
         </Button>
       </Box>
 
       {branchesError && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert 
+          severity="error" 
+          sx={{
+            mb: { xs: 2, sm: 3 },
+            fontSize: { xs: '0.8rem', sm: '0.875rem' },
+          }}
+        >
           Failed to load branches. Please try again.
         </Alert>
       )}
 
       <Card>
-        <CardContent>
-          <TableContainer component={Paper}>
+        <CardContent sx={{ ...RESPONSIVE_PATTERNS.responsivePadding }}>
+          <TableContainer 
+            component={Paper}
+            sx={RESPONSIVE_PATTERNS.tableWrapper}
+          >
             <Table>
               <TableHead>
                 <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                  <TableCell><strong>Branch Name</strong></TableCell>
-                  <TableCell><strong>Address</strong></TableCell>
-                  <TableCell align="center"><strong>Status</strong></TableCell>
-                  <TableCell align="center"><strong>Doctors</strong></TableCell>
-                  <TableCell align="center"><strong>Users</strong></TableCell>
-                  <TableCell align="center"><strong>Actions</strong></TableCell>
+                  <TableCell sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, minWidth: 140, fontWeight: 'bold' }}>Branch Name</TableCell>
+                  <TableCell sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, minWidth: 150, fontWeight: 'bold' }}>Address</TableCell>
+                  <TableCell align="center" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, minWidth: 100, fontWeight: 'bold' }}>Status</TableCell>
+                  <TableCell align="center" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, minWidth: 80, fontWeight: 'bold' }}>Doctors</TableCell>
+                  <TableCell align="center" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, minWidth: 80, fontWeight: 'bold' }}>Users</TableCell>
+                  <TableCell align="center" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, minWidth: 100, fontWeight: 'bold' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

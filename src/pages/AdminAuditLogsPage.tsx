@@ -21,6 +21,7 @@ import {
   MenuItem,
   Chip,
   TablePagination,
+  Typography,
 } from '@mui/material';
 import {
   Info as InfoIcon,
@@ -29,6 +30,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { auditLogsService, type AuditLog } from '../api/audit-logs.service';
 import { format } from 'date-fns';
+import { RESPONSIVE_PATTERNS } from '../styles/responsive';
 
 const AdminAuditLogsPage: React.FC = () => {
   // State for pagination
@@ -122,26 +124,49 @@ const AdminAuditLogsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <Box sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Audit Logs</h1>
+      <Box sx={RESPONSIVE_PATTERNS.headerLayout}>
+        <Typography 
+          variant="h4"
+          sx={{
+            fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' },
+          }}
+        >
+          Audit Logs
+        </Typography>
         <Button
           startIcon={<RefreshIcon />}
           onClick={handleRefresh}
           variant="outlined"
+          sx={{
+            width: { xs: '100%', sm: 'auto' },
+            minHeight: { xs: 44, md: 40 },
+          }}
         >
           Refresh
         </Button>
       </Box>
 
       {/* Filters Card */}
-      <Card>
-        <CardContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <h3 style={{ margin: 0, marginBottom: 8 }}>Filters</h3>
+      <Card sx={{ mb: { xs: 2, sm: 2.5, md: 3 } }}>
+        <CardContent sx={{ ...RESPONSIVE_PATTERNS.responsivePadding }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, sm: 2 } }}>
+            <Typography 
+              variant="h6"
+              sx={{
+                margin: 0,
+                fontSize: { xs: '1rem', sm: '1.125rem' },
+              }}
+            >
+              Filters
+            </Typography>
 
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, 
+              gap: { xs: 1, sm: 1.5 }
+            }}>
               {/* Date Range */}
               <TextField
                   label="Start Date"
@@ -154,6 +179,9 @@ const AdminAuditLogsPage: React.FC = () => {
                   fullWidth
                   InputLabelProps={{ shrink: true }}
                   size="small"
+                  sx={{
+                    '& input': { fontSize: { xs: '0.8rem', sm: '0.875rem' } },
+                  }}
                 />
               <TextField
                 label="End Date"
@@ -166,6 +194,9 @@ const AdminAuditLogsPage: React.FC = () => {
                 fullWidth
                 InputLabelProps={{ shrink: true }}
                 size="small"
+                sx={{
+                  '& input': { fontSize: { xs: '0.8rem', sm: '0.875rem' } },
+                }}
               />
 
               {/* User ID */}
@@ -180,6 +211,9 @@ const AdminAuditLogsPage: React.FC = () => {
                 fullWidth
                 size="small"
                 placeholder="Filter by user ID"
+                sx={{
+                  '& input': { fontSize: { xs: '0.8rem', sm: '0.875rem' } },
+                }}
               />
 
               {/* Action */}
@@ -193,6 +227,9 @@ const AdminAuditLogsPage: React.FC = () => {
                 }}
                 fullWidth
                 size="small"
+                sx={{
+                  '& .MuiOutlinedInput-input': { fontSize: { xs: '0.8rem', sm: '0.875rem' } },
+                }}
               >
                 <MenuItem value="">All Actions</MenuItem>
                 {!actionsLoading && availableActions && availableActions.map((act) => (
@@ -213,6 +250,9 @@ const AdminAuditLogsPage: React.FC = () => {
                 }}
                 fullWidth
                 size="small"
+                sx={{
+                  '& .MuiOutlinedInput-input': { fontSize: { xs: '0.8rem', sm: '0.875rem' } },
+                }}
               >
                 <MenuItem value="">All Entity Types</MenuItem>
                 {!entityTypesLoading && availableEntityTypes && availableEntityTypes.map((type) => (
@@ -228,7 +268,10 @@ const AdminAuditLogsPage: React.FC = () => {
               <Button
                 variant="outlined"
                 onClick={handleClearFilters}
-                fullWidth
+                sx={{
+                  width: { xs: '100%', sm: 'auto' },
+                  minHeight: { xs: 40, md: 36 },
+                }}
               >
                 Clear Filters
               </Button>
@@ -239,14 +282,20 @@ const AdminAuditLogsPage: React.FC = () => {
 
       {/* Error Alert */}
       {logsError && (
-        <Alert severity="error">
+        <Alert 
+          severity="error"
+          sx={{
+            mb: { xs: 2, sm: 2.5, md: 3 },
+            fontSize: { xs: '0.8rem', sm: '0.875rem' },
+          }}
+        >
           Error loading audit logs: {(logsError as { message?: string })?.message || 'Unknown error'}
         </Alert>
       )}
 
       {/* Loading State */}
       {logsLoading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: { xs: 2, sm: 3, md: 4 } }}>
           <CircularProgress />
         </Box>
       )}
@@ -256,17 +305,23 @@ const AdminAuditLogsPage: React.FC = () => {
         <>
           <Card>
             <CardContent sx={{ p: 0 }}>
-              <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 400px)' }}>
+              <TableContainer 
+                component={Paper} 
+                sx={{ 
+                  maxHeight: { xs: 'calc(100vh - 500px)', md: 'calc(100vh - 400px)' },
+                  ...RESPONSIVE_PATTERNS.tableWrapper,
+                }}
+              >
                 <Table stickyHeader>
                   <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 'bold', minWidth: 120 }}>Timestamp</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', minWidth: 100 }}>User</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', minWidth: 100 }}>Role</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', minWidth: 130 }}>Action</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', minWidth: 100 }}>Entity Type</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', minWidth: 80 }}>Entity ID</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', minWidth: 80, textAlign: 'center' }}>
+                      <TableCell sx={{ fontWeight: 'bold', minWidth: 120, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Timestamp</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', minWidth: 100, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>User</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', minWidth: 100, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Role</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', minWidth: 130, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Action</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', minWidth: 100, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Entity Type</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', minWidth: 80, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Entity ID</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', minWidth: 80, textAlign: 'center', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                         Actions
                       </TableCell>
                     </TableRow>
@@ -275,7 +330,7 @@ const AdminAuditLogsPage: React.FC = () => {
                     {auditLogsData.items && auditLogsData.items.length > 0 ? (
                       auditLogsData.items.map((log) => (
                         <TableRow key={log.id} hover>
-                          <TableCell>
+                          <TableCell sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                             {format(new Date(log.timestamp), 'yyyy-MM-dd HH:mm:ss')}
                           </TableCell>
                           <TableCell>

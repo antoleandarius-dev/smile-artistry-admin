@@ -6,8 +6,6 @@
 // Components
 export { default as PatientList } from './components/PatientList';
 export { default as CreatePatientDialog } from './components/CreatePatientDialog';
-export { default as PatientDetail } from './components/PatientDetail';
-export { default as PatientTimeline } from './components/PatientTimeline';
 export { default as RecordUploadDialog } from './components/RecordUploadDialog';
 
 // Hooks

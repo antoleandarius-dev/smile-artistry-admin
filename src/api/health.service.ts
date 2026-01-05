@@ -1,5 +1,4 @@
 import axios from 'axios';
-import apiClient from './client';
 import { apiConfig } from './config';
 
 /**

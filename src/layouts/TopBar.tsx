@@ -2,7 +2,6 @@ import { AppBar, Toolbar, Typography, IconButton, Box, Chip, useTheme, useMediaQ
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { getUserData } from '../shared/utils/auth';
-import { TOUCH_SPACING } from '../styles/responsive';
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -12,7 +11,6 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
   const userData = getUserData();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
     <AppBar 

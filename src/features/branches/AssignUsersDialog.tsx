@@ -54,7 +54,6 @@ const AssignUsersDialog: React.FC<AssignUsersDialogProps> = ({
   useEffect(() => {
     if (branch && open && allUsers) {
       // Load assigned users for this branch
-      const branchUserIds = new Set<number>();
       // We would need to fetch branch's assigned users from backend
       // For now, this is a simplification - ideally we'd have an endpoint
       setAssignedUsers([]);

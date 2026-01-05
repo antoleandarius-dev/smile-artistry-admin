@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Box, Typography, Grid, Paper } from '@mui/material';
-import { DoctorList, type DoctorDetail, DoctorAvailability, useDoctors, useDoctor, useDoctorAvailability } from '../features/doctors';
+import { Box, Typography, Paper } from '@mui/material';
+import { DoctorList, DoctorDetail, DoctorAvailability, useDoctors, useDoctor, useDoctorAvailability } from '../features/doctors';
 import type { Doctor } from '../features/doctors';
+import { RESPONSIVE_PATTERNS } from '../styles/responsive';
 
 const DoctorsPage = () => {
   const [selectedDoctorId, setSelectedDoctorId] = useState<number | null>(null);
@@ -21,15 +22,34 @@ const DoctorsPage = () => {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom sx={{ mb: 3 }}>
+      <Typography 
+        variant="h4" 
+        gutterBottom 
+        sx={{ 
+          mb: { xs: 2, sm: 3 },
+          fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' },
+        }}
+      >
         Doctors Directory
       </Typography>
 
-      <Grid container spacing={3}>
+      <Box sx={{
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+        gap: { xs: 1.5, sm: 2, md: 3 },
+      }}>
         {/* Doctors List */}
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+        <Box>
+          <Paper sx={{ ...RESPONSIVE_PATTERNS.responsivePadding }}>
+            <Typography 
+              variant="h6" 
+              gutterBottom 
+              sx={{ 
+                fontWeight: 600, 
+                mb: { xs: 1.5, sm: 2 },
+                fontSize: { xs: '1rem', sm: '1.125rem' },
+              }}
+            >
               Available Doctors
             </Typography>
             <DoctorList
@@ -39,15 +59,26 @@ const DoctorsPage = () => {
               onSelectDoctor={handleSelectDoctor}
             />
           </Paper>
-        </Grid>
+        </Box>
 
         {/* Doctor Details and Availability */}
-        <Grid item xs={12} md={6}>
-          <Grid container spacing={2}>
-            {/* Doctor Details */}
-            <Grid item xs={12}>
-              <Paper sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+        <Box sx={{
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          gap: { xs: 1.5, sm: 2 },
+        }}>
+          {/* Doctor Details */}
+          <Box>
+              <Paper sx={{ ...RESPONSIVE_PATTERNS.responsivePadding }}>
+                <Typography 
+                  variant="h6" 
+                  gutterBottom 
+                  sx={{ 
+                    fontWeight: 600, 
+                    mb: { xs: 1.5, sm: 2 },
+                    fontSize: { xs: '1rem', sm: '1.125rem' },
+                  }}
+                >
                   Doctor Information
                 </Typography>
                 {selectedDoctorId ? (
@@ -57,17 +88,29 @@ const DoctorsPage = () => {
                     error={doctorError}
                   />
                 ) : (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary"
+                    sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+                  >
                     Select a doctor from the list to view details.
                   </Typography>
                 )}
               </Paper>
-            </Grid>
+          </Box>
 
-            {/* Availability */}
-            <Grid item xs={12}>
-              <Paper sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+          {/* Availability */}
+          <Box>
+              <Paper sx={{ ...RESPONSIVE_PATTERNS.responsivePadding }}>
+                <Typography 
+                  variant="h6" 
+                  gutterBottom 
+                  sx={{ 
+                    fontWeight: 600, 
+                    mb: { xs: 1.5, sm: 2 },
+                    fontSize: { xs: '1rem', sm: '1.125rem' },
+                  }}
+                >
                   Availability
                 </Typography>
                 {selectedDoctorId ? (
@@ -77,15 +120,18 @@ const DoctorsPage = () => {
                     error={availabilityError}
                   />
                 ) : (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary"
+                    sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+                  >
                     Select a doctor to view availability.
                   </Typography>
                 )}
               </Paper>
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid>
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
 };

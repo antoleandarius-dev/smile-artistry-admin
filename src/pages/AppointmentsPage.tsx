@@ -14,6 +14,7 @@ import {
   useAppointments,
 } from '../features/appointments';
 import type { Appointment } from '../features/appointments';
+import { RESPONSIVE_PATTERNS } from '../styles/responsive';
 
 const AppointmentsPage = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -47,14 +48,27 @@ const AppointmentsPage = () => {
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">
+      <Box 
+        sx={{
+          ...RESPONSIVE_PATTERNS.headerLayout,
+        }}
+      >
+        <Typography 
+          variant="h4"
+          sx={{
+            fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' },
+          }}
+        >
           Appointments
         </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setCreateDialogOpen(true)}
+          sx={{
+            width: { xs: '100%', sm: 'auto' },
+            minHeight: { xs: 44, md: 40 },
+          }}
         >
           New Appointment
         </Button>

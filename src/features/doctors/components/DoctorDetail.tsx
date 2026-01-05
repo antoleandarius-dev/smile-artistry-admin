@@ -5,10 +5,10 @@
 
 import { CircularProgress, Alert, Box, Card, CardContent, Stack, Typography } from '@mui/material';
 import { Check as CheckIcon, Close as CloseIcon } from '@mui/icons-material';
-import type { DoctorDetail } from '../types';
+import type { DoctorDetail as DoctorDetailType } from '../types';
 
 interface DoctorDetailProps {
-  doctor: DoctorDetail | null;
+  doctor: DoctorDetailType | null;
   isLoading: boolean;
   error: Error | null;
 }

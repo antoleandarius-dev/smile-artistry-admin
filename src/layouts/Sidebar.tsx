@@ -30,10 +30,9 @@ import { DRAWER_CONFIG, TOUCH_SPACING } from '../styles/responsive';
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
-  isSmallScreen?: boolean;
 }
 
-const Sidebar = ({ open, onClose, isSmallScreen = false }: SidebarProps) => {
+const Sidebar = ({ open, onClose }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentUser = getCurrentUser();

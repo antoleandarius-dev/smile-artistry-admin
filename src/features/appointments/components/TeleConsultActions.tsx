@@ -97,7 +97,7 @@ const TeleConsultActions: React.FC<TeleConsultActionsProps> = ({
       console.log('Start session response:', response);
       
       // Get the start_url from the backend response
-      const { start_url, session } = response;
+      const { start_url } = response;
       
       if (!start_url) {
         throw new Error('No start URL provided - unable to initialize consultation');

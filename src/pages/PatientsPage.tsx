@@ -4,17 +4,18 @@
  */
 
 import { useState } from 'react';
-import { Typography, Box, Button, Grid, Paper, Tabs, Tab } from '@mui/material';
+import { Typography, Box, Button, Paper, Tabs, Tab } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import {
   PatientList,
   CreatePatientDialog,
-  PatientDetail,
-  PatientTimeline,
   RecordUploadDialog,
   usePatients,
 } from '../features/patients';
+import { default as PatientDetail } from '../features/patients/components/PatientDetail';
+import { default as PatientTimeline } from '../features/patients/components/PatientTimeline';
 import type { Patient } from '../features/patients';
+import { RESPONSIVE_PATTERNS } from '../styles/responsive';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -33,7 +34,13 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`patient-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ py: 2 }}>{children}</Box>}
+      {value === index && (
+        <Box sx={{ 
+          py: { xs: 1.5, sm: 2 },
+        }}>
+          {children}
+        </Box>
+      )}
     </div>
   );
 }
@@ -64,13 +71,21 @@ const PatientsPage = () => {
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">Patients</Typography>
-        <Box sx={{ display: 'flex', gap: 1 }}>
+      <Box sx={RESPONSIVE_PATTERNS.headerLayout}>
+        <Typography 
+          variant="h4"
+          sx={{
+            fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' },
+          }}
+        >
+          Patients
+        </Typography>
+        <Box sx={RESPONSIVE_PATTERNS.buttonGroup}>
           {selectedPatient && (
             <Button
               variant="outlined"
               onClick={() => setRecordUploadOpen(true)}
+              sx={{ minHeight: { xs: 44, md: 40 } }}
             >
               Upload Record
             </Button>
@@ -79,6 +94,7 @@ const PatientsPage = () => {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => setCreateDialogOpen(true)}
+            sx={{ minHeight: { xs: 44, md: 40 } }}
           >
             New Patient
           </Button>
@@ -86,11 +102,25 @@ const PatientsPage = () => {
       </Box>
 
       {/* Tabs */}
-      <Paper sx={{ mb: 3 }}>
+      <Paper 
+        sx={{ 
+          mb: { xs: 2, sm: 3 },
+          overflowX: { xs: 'auto', md: 'visible' },
+        }}
+      >
         <Tabs
           value={tabValue}
           onChange={handleTabChange}
           aria-label="patient tabs"
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{
+            '& .MuiTab-root': {
+              fontSize: { xs: '0.75rem', sm: '0.875rem' },
+              minHeight: { xs: 44, md: 48 },
+              px: { xs: 1, sm: 2 },
+            },
+          }}
         >
           <Tab label="Patient List" id="patient-tab-0" aria-controls="patient-tabpanel-0" />
           <Tab
@@ -108,7 +138,7 @@ const PatientsPage = () => {
         </Tabs>
 
         {/* Tab Content */}
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ ...RESPONSIVE_PATTERNS.responsivePadding }}>
           {/* Patient List Tab */}
           <TabPanel value={tabValue} index={0}>
             <PatientList
@@ -132,11 +162,27 @@ const PatientsPage = () => {
           {/* Medical Records (Timeline) Tab */}
           <TabPanel value={tabValue} index={2}>
             <Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6">Patient Timeline</Typography>
+              <Box sx={{ 
+                display: 'flex', 
+                flexDirection: { xs: 'column', sm: 'row' },
+                justifyContent: 'space-between', 
+                alignItems: { xs: 'flex-start', sm: 'center' },
+                gap: { xs: 1, sm: 2 },
+                mb: { xs: 1.5, sm: 2 },
+              }}>
+                <Typography 
+                  variant="h6"
+                  sx={{ fontSize: { xs: '1rem', sm: '1.125rem' } }}
+                >
+                  Patient Timeline
+                </Typography>
                 <Button
                   size="small"
                   onClick={() => setRecordUploadOpen(true)}
+                  sx={{ 
+                    minHeight: { xs: 40, md: 36 },
+                    width: { xs: '100%', sm: 'auto' },
+                  }}
                 >
                   Upload Record
                 </Button>

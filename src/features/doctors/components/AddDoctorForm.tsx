@@ -8,7 +8,6 @@ import {
   Box,
   Button,
   TextField,
-  Grid,
   Alert,
   CircularProgress,
   FormControlLabel,
@@ -34,7 +33,7 @@ const AddDoctorForm = ({ branches, onSuccess, onError }: AddDoctorFormProps) => 
     branch_ids: [],
   });
 
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const createDoctorMutation = useCreateDoctor();
@@ -127,9 +126,13 @@ const AddDoctorForm = ({ branches, onSuccess, onError }: AddDoctorFormProps) => 
         </Alert>
       )}
 
-      <Grid container spacing={2}>
+      <Box sx={{
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+        gap: 2,
+      }}>
         {/* Name */}
-        <Grid item xs={12} md={6}>
+        <Box>
           <TextField
             fullWidth
             label="Name"
@@ -140,10 +143,10 @@ const AddDoctorForm = ({ branches, onSuccess, onError }: AddDoctorFormProps) => 
             helperText={errors.name}
             required
           />
-        </Grid>
+        </Box>
 
         {/* Email */}
-        <Grid item xs={12} md={6}>
+        <Box>
           <TextField
             fullWidth
             label="Email"
@@ -155,10 +158,10 @@ const AddDoctorForm = ({ branches, onSuccess, onError }: AddDoctorFormProps) => 
             helperText={errors.email}
             required
           />
-        </Grid>
+        </Box>
 
         {/* Phone */}
-        <Grid item xs={12} md={6}>
+        <Box>
           <TextField
             fullWidth
             label="Phone"
@@ -166,10 +169,10 @@ const AddDoctorForm = ({ branches, onSuccess, onError }: AddDoctorFormProps) => 
             value={formData.phone}
             onChange={handleInputChange}
           />
-        </Grid>
+        </Box>
 
         {/* Specialization */}
-        <Grid item xs={12} md={6}>
+        <Box>
           <TextField
             fullWidth
             label="Specialization"
@@ -180,10 +183,10 @@ const AddDoctorForm = ({ branches, onSuccess, onError }: AddDoctorFormProps) => 
             helperText={errors.specialization}
             required
           />
-        </Grid>
+        </Box>
 
         {/* Registration Number */}
-        <Grid item xs={12} md={6}>
+        <Box>
           <TextField
             fullWidth
             label="Registration Number"
@@ -194,10 +197,10 @@ const AddDoctorForm = ({ branches, onSuccess, onError }: AddDoctorFormProps) => 
             helperText={errors.registration_no}
             required
           />
-        </Grid>
+        </Box>
 
         {/* Password */}
-        <Grid item xs={12} md={6}>
+        <Box>
           <TextField
             fullWidth
             label="Password"
@@ -209,10 +212,10 @@ const AddDoctorForm = ({ branches, onSuccess, onError }: AddDoctorFormProps) => 
             helperText={errors.password}
             required
           />
-        </Grid>
+        </Box>
 
         {/* Branches */}
-        <Grid item xs={12}>
+        <Box sx={{ gridColumn: { xs: '1 / -1' } }}>
           <Box sx={{ mb: 2 }}>
             <p style={{ marginBottom: '12px', fontWeight: 500 }}>
               Assign Branches (optional)
@@ -238,10 +241,10 @@ const AddDoctorForm = ({ branches, onSuccess, onError }: AddDoctorFormProps) => 
               ))}
             </Box>
           </Box>
-        </Grid>
+        </Box>
 
         {/* Submit Button */}
-        <Grid item xs={12}>
+        <Box sx={{ gridColumn: { xs: '1 / -1' } }}>
           <Button
             type="submit"
             variant="contained"
@@ -258,8 +261,8 @@ const AddDoctorForm = ({ branches, onSuccess, onError }: AddDoctorFormProps) => 
               'Add Doctor'
             )}
           </Button>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Box>
   );
 };

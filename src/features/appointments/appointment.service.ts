@@ -15,7 +15,6 @@ import type {
   TeleSession,
   StartTeleSessionRequest,
   StartTeleSessionResponse,
-  JoinTeleSessionResponse,
   TeleSessionJoinToken,
 } from './types';
 

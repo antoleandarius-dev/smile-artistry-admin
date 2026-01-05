@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -20,12 +20,12 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Typography,
 } from '@mui/material';
 import {
   Edit as EditIcon,
   Lock as LockIcon,
   LockOpen as LockOpenIcon,
-  Delete as DeleteIcon,
   VpnKey as ResetIcon,
   PersonAdd as PersonAddIcon,
 } from '@mui/icons-material';
@@ -36,6 +36,7 @@ import AddUserDialog from '../features/users/AddUserDialog';
 import ResetPasswordDialog from '../features/users/ResetPasswordDialog';
 import AssignRoleDialog from '../features/users/AssignRoleDialog';
 import { getCurrentUser } from '../shared/utils/auth';
+import { RESPONSIVE_PATTERNS } from '../styles/responsive';
 
 const AdminUsersPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -131,7 +132,7 @@ const AdminUsersPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', p: { xs: 2, sm: 3, md: 4 } }}>
         <CircularProgress />
       </Box>
     );
@@ -139,58 +140,109 @@ const AdminUsersPage: React.FC = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <div>
-          <h1>Users & Roles</h1>
-          <p>Manage system users and their roles</p>
-        </div>
+      <Box sx={RESPONSIVE_PATTERNS.headerLayout}>
+        <Box>
+          <Typography 
+            variant="h4"
+            sx={{
+              fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' },
+              mb: 0.5,
+            }}
+          >
+            Users & Roles
+          </Typography>
+          <Typography 
+            variant="body2"
+            color="text.secondary"
+            sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+          >
+            Manage system users and their roles
+          </Typography>
+        </Box>
         <Button
           variant="contained"
           startIcon={<PersonAddIcon />}
           onClick={handleAddUserClick}
+          sx={{
+            width: { xs: '100%', sm: 'auto' },
+            minHeight: { xs: 44, md: 40 },
+          }}
         >
           Add User
         </Button>
       </Box>
 
-      {error && <Alert severity="error">Failed to load users. Please try again.</Alert>}
+      {error && (
+        <Alert 
+          severity="error"
+          sx={{
+            mb: { xs: 2, sm: 3 },
+            fontSize: { xs: '0.8rem', sm: '0.875rem' },
+          }}
+        >
+          Failed to load users. Please try again.
+        </Alert>
+      )}
 
       <Card>
-        <CardContent>
-          <TableContainer component={Paper}>
+        <CardContent sx={{ ...RESPONSIVE_PATTERNS.responsivePadding }}>
+          <TableContainer 
+            component={Paper}
+            sx={{
+              ...RESPONSIVE_PATTERNS.tableWrapper,
+            }}
+          >
             <Table>
               <TableHead>
                 <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Role</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell align="right">Actions</TableCell>
+                  <TableCell sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, minWidth: 120 }}>Name</TableCell>
+                  <TableCell sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, minWidth: 150 }}>Email</TableCell>
+                  <TableCell sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, minWidth: 100 }}>Role</TableCell>
+                  <TableCell sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, minWidth: 100 }}>Status</TableCell>
+                  <TableCell 
+                    align="right"
+                    sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, minWidth: 100 }}
+                  >
+                    Actions
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {users && users.length > 0 ? (
                   users.map((user) => (
                     <TableRow key={user.id} hover>
-                      <TableCell>{user.name}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{getRoleNameById(user.role_id)}</TableCell>
-                      <TableCell>
+                      <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>{user.name}</TableCell>
+                      <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>{user.email}</TableCell>
+                      <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>{getRoleNameById(user.role_id)}</TableCell>
+                      <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                         <Chip
                           label={user.is_active ? 'Active' : 'Inactive'}
                           color={user.is_active ? 'success' : 'default'}
                           variant="outlined"
                           size="small"
+                          sx={{ fontSize: { xs: '0.65rem', sm: '0.75rem' } }}
                         />
                       </TableCell>
-                      <TableCell align="right">
+                      <TableCell 
+                        align="right"
+                        sx={{
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                          display: 'flex',
+                          gap: { xs: 0.25, sm: 0.5 },
+                          justifyContent: 'flex-end',
+                        }}
+                      >
                         <Tooltip title="Assign Role">
                           <IconButton
                             size="small"
                             onClick={() => handleAssignRoleClick(user)}
                             disabled={currentUser?.id === user.id}
+                            sx={{
+                              minHeight: { xs: 40, md: 36 },
+                              minWidth: { xs: 40, md: 36 },
+                            }}
                           >
-                            <EditIcon />
+                            <EditIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
 

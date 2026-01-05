@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Toolbar, useTheme, useMediaQuery } from '@mui/material';
+import { Box, Toolbar } from '@mui/material';
 import TopBar from './TopBar';
 import Sidebar from './Sidebar';
 import { RESPONSIVE_PATTERNS } from '../styles/responsive';
@@ -10,8 +10,6 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleSidebarToggle = () => {
     setSidebarOpen(!sidebarOpen);
@@ -27,7 +25,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       <Sidebar 
         open={sidebarOpen} 
         onClose={handleSidebarClose}
-        isSmallScreen={isSmallScreen}
       />
       <Box 
         component="main" 
