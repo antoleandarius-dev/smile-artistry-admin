@@ -12,7 +12,10 @@ import {
   MenuItem,
   Box,
   Alert,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
+import { RESPONSIVE_PATTERNS } from '../../styles/responsive';
 import { usersService, type CreateUserRequest } from '../../api/users.service';
 
 interface AddUserDialogProps {
@@ -28,6 +31,8 @@ const AddUserDialog: React.FC<AddUserDialogProps> = ({
   onSuccess,
   roles,
 }) => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateUserRequest>({
@@ -102,10 +107,23 @@ const AddUserDialog: React.FC<AddUserDialogProps> = ({
   const availableRoles = roles.filter((role) => role.name !== 'doctor');
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Add New User</DialogTitle>
-      <DialogContent>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      maxWidth={isSmallScreen ? 'xs' : 'sm'}
+      fullWidth
+      PaperProps={{
+        sx: {
+          m: { xs: 1, sm: 2 },
+          width: { xs: 'calc(100% - 16px)', sm: '100%' },
+        }
+      }}
+    >
+      <DialogTitle sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+        Add New User
+      </DialogTitle>
+      <DialogContent sx={{ ...RESPONSIVE_PATTERNS.responsivePadding }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, sm: 2 }, mt: 1.5 }}>
           {error && <Alert severity="error">{error}</Alert>}
 
           <TextField
@@ -115,6 +133,13 @@ const AddUserDialog: React.FC<AddUserDialogProps> = ({
             onChange={handleChange}
             fullWidth
             required
+            slotProps={{
+              input: {
+                sx: {
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                },
+              },
+            }}
           />
 
           <TextField
@@ -125,6 +150,13 @@ const AddUserDialog: React.FC<AddUserDialogProps> = ({
             onChange={handleChange}
             fullWidth
             required
+            slotProps={{
+              input: {
+                sx: {
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                },
+              },
+            }}
           />
 
           <TextField
@@ -133,6 +165,13 @@ const AddUserDialog: React.FC<AddUserDialogProps> = ({
             value={formData.phone}
             onChange={handleChange}
             fullWidth
+            slotProps={{
+              input: {
+                sx: {
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                },
+              },
+            }}
           />
 
           <TextField
@@ -143,6 +182,13 @@ const AddUserDialog: React.FC<AddUserDialogProps> = ({
             onChange={handleChange}
             fullWidth
             required
+            slotProps={{
+              input: {
+                sx: {
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                },
+              },
+            }}
           />
 
           <FormControl fullWidth required>
@@ -164,15 +210,15 @@ const AddUserDialog: React.FC<AddUserDialogProps> = ({
           </FormControl>
         </Box>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} disabled={loading}>
+      <DialogActions sx={{ p: { xs: 1.5, sm: 2 }, gap: { xs: 1, sm: 1.5 } }}>
+        <Button onClick={onClose} disabled={loading} sx={{ minWidth: { xs: 'auto', sm: '80px' } }}>
           Cancel
         </Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
-          loading={loading}
           disabled={loading}
+          sx={{ minWidth: { xs: 'auto', sm: '100px' } }}
         >
           Create User
         </Button>

@@ -8,7 +8,10 @@ import {
   Button,
   Box,
   Alert,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
+import { RESPONSIVE_PATTERNS } from '../../styles/responsive';
 import { branchService, type BranchDetail } from '../../api/branches.service';
 
 interface EditBranchDialogProps {
@@ -31,6 +34,8 @@ const EditBranchDialog: React.FC<EditBranchDialogProps> = ({
     address: '',
     phone: '',
   });
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     if (branch && open) {
@@ -84,10 +89,23 @@ const EditBranchDialog: React.FC<EditBranchDialogProps> = ({
   if (!branch) return null;
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Edit Branch</DialogTitle>
-      <DialogContent>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      maxWidth={isSmallScreen ? 'xs' : 'sm'}
+      fullWidth
+      PaperProps={{
+        sx: {
+          m: { xs: 1, sm: 2 },
+          width: { xs: 'calc(100% - 16px)', sm: '100%' },
+        }
+      }}
+    >
+      <DialogTitle sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+        Edit Branch
+      </DialogTitle>
+      <DialogContent sx={{ ...RESPONSIVE_PATTERNS.responsivePadding }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, sm: 2 }, mt: 1.5 }}>
           {error && <Alert severity="error">{error}</Alert>}
 
           <TextField
@@ -97,6 +115,13 @@ const EditBranchDialog: React.FC<EditBranchDialogProps> = ({
             onChange={handleChange}
             fullWidth
             required
+            slotProps={{
+              input: {
+                sx: {
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                },
+              },
+            }}
           />
 
           <TextField
@@ -107,6 +132,13 @@ const EditBranchDialog: React.FC<EditBranchDialogProps> = ({
             fullWidth
             multiline
             rows={2}
+            slotProps={{
+              input: {
+                sx: {
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                },
+              },
+            }}
           />
 
           <TextField
@@ -115,15 +147,25 @@ const EditBranchDialog: React.FC<EditBranchDialogProps> = ({
             value={formData.phone}
             onChange={handleChange}
             fullWidth
+            slotProps={{
+              input: {
+                sx: {
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                },
+              },
+            }}
           />
         </Box>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+      <DialogActions sx={{ p: { xs: 1.5, sm: 2 }, gap: { xs: 1, sm: 1.5 } }}>
+        <Button onClick={onClose} sx={{ minWidth: { xs: 'auto', sm: '80px' } }}>
+          Cancel
+        </Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
           disabled={loading}
+          sx={{ minWidth: { xs: 'auto', sm: '100px' } }}
         >
           {loading ? 'Updating...' : 'Update Branch'}
         </Button>

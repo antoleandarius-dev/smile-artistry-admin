@@ -15,11 +15,14 @@ import {
   Box,
   Alert,
   CircularProgress,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import { useCreateAppointment, useUsers } from '../hooks';
 import type { AppointmentType } from '../types';
 import { usePatients } from '../../patients';
 import { useDoctors } from '../../doctors';
+import { RESPONSIVE_PATTERNS } from '../../../styles/responsive';
 
 interface CreateAppointmentDialogProps {
   open: boolean;
@@ -27,6 +30,9 @@ interface CreateAppointmentDialogProps {
 }
 
 const CreateAppointmentDialog: React.FC<CreateAppointmentDialogProps> = ({ open, onClose }) => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [formData, setFormData] = useState({
     patient_id: '',
     doctor_id: '',
@@ -111,11 +117,22 @@ const CreateAppointmentDialog: React.FC<CreateAppointmentDialogProps> = ({ open,
     formData.appointment_time;
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      maxWidth={isSmallScreen ? 'xs' : 'sm'}
+      fullWidth
+      PaperProps={{
+        sx: {
+          m: { xs: 1, sm: 2 },
+          width: { xs: 'calc(100% - 16px)', sm: '100%' },
+        }
+      }}
+    >
       <form onSubmit={handleSubmit}>
-        <DialogTitle>Create New Appointment</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+        <DialogTitle sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Create New Appointment</DialogTitle>
+        <DialogContent sx={{ ...RESPONSIVE_PATTERNS.responsivePadding }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, sm: 2 }, mt: 1.5 }}>
             {createMutation.isError && (
               <Alert severity="error">
                 Failed to create appointment. Please try again.
@@ -195,7 +212,7 @@ const CreateAppointmentDialog: React.FC<CreateAppointmentDialogProps> = ({ open,
             </TextField>
           </Box>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: { xs: 1.5, sm: 2 }, gap: { xs: 1, sm: 1.5 } }}>
           <Button onClick={handleClose} disabled={createMutation.isPending}>
             Cancel
           </Button>

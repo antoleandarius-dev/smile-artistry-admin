@@ -18,10 +18,13 @@ import {
   ListItemSecondaryAction,
   IconButton,
   Paper,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
 import { branchService, type BranchDetail } from '../../api/branches.service';
+import { RESPONSIVE_PATTERNS } from '../../styles/responsive';
 
 interface Doctor {
   id: number;
@@ -44,6 +47,9 @@ const AssignDoctorsDialog: React.FC<AssignDoctorsDialogProps> = ({
   onSuccess,
   branch,
 }) => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedDoctorId, setSelectedDoctorId] = useState<number>(0);
@@ -127,10 +133,21 @@ const AssignDoctorsDialog: React.FC<AssignDoctorsDialogProps> = ({
   const availableDoctors = allDoctors?.filter((d) => !assignedDoctorIds.has(d.id)) || [];
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Assign Doctors to Branch</DialogTitle>
-      <DialogContent>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      maxWidth={isSmallScreen ? 'xs' : 'sm'}
+      fullWidth
+      PaperProps={{
+        sx: {
+          m: { xs: 1, sm: 2 },
+          width: { xs: 'calc(100% - 16px)', sm: '100%' },
+        }
+      }}
+    >
+      <DialogTitle sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Assign Doctors to Branch</DialogTitle>
+      <DialogContent sx={{ ...RESPONSIVE_PATTERNS.responsivePadding }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, sm: 2 }, mt: { xs: 1.5, sm: 2 } }}>
           {error && <Alert severity="error">{error}</Alert>}
 
           {doctorsLoading ? (
@@ -195,7 +212,7 @@ const AssignDoctorsDialog: React.FC<AssignDoctorsDialogProps> = ({
           )}
         </Box>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ p: { xs: 1.5, sm: 2 }, gap: { xs: 1, sm: 1.5 } }}>
         <Button onClick={onClose}>Close</Button>
       </DialogActions>
     </Dialog>

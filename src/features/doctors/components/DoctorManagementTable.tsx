@@ -122,8 +122,8 @@ const DoctorManagementTable = ({
 
   return (
     <>
-      <TableContainer component={Paper}>
-        <Table>
+      <TableContainer component={Paper} sx={{ overflowX: { xs: 'auto', md: 'visible' } }}>
+        <Table sx={{ minWidth: { xs: 800, md: 'auto' } }}>
           <TableHead>
             <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
               <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>

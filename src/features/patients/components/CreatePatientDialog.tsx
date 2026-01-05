@@ -17,7 +17,10 @@ import {
   Select,
   MenuItem,
   Alert,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
+import { RESPONSIVE_PATTERNS } from '../../../styles/responsive';
 import type { CreatePatientRequest } from '../types';
 import { useCreatePatient } from '../hooks';
 
@@ -27,6 +30,8 @@ interface CreatePatientDialogProps {
 }
 
 const CreatePatientDialog = ({ open, onClose }: CreatePatientDialogProps) => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const [formData, setFormData] = useState<CreatePatientRequest>({
     name: '',
     phone: '',
@@ -106,10 +111,23 @@ const CreatePatientDialog = ({ open, onClose }: CreatePatientDialogProps) => {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Create New Patient</DialogTitle>
-      <DialogContent>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      maxWidth={isSmallScreen ? 'xs' : 'sm'}
+      fullWidth
+      PaperProps={{
+        sx: {
+          m: { xs: 1, sm: 2 },
+          width: { xs: 'calc(100% - 16px)', sm: '100%' },
+        }
+      }}
+    >
+      <DialogTitle sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+        Create New Patient
+      </DialogTitle>
+      <DialogContent sx={{ ...RESPONSIVE_PATTERNS.responsivePadding }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, sm: 2 }, pt: 1.5 }}>
           {validationError && (
             <Alert severity="error" onClose={() => setValidationError(null)}>
               {validationError}
@@ -187,14 +205,15 @@ const CreatePatientDialog = ({ open, onClose }: CreatePatientDialogProps) => {
           />
         </Box>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} disabled={createPatient.isPending}>
+      <DialogActions sx={{ p: { xs: 1.5, sm: 2 }, gap: { xs: 1, sm: 1.5 } }}>
+        <Button onClick={handleClose} disabled={createPatient.isPending} sx={{ minWidth: { xs: 'auto', sm: '80px' } }}>
           Cancel
         </Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
           disabled={createPatient.isPending}
+          sx={{ minWidth: { xs: 'auto', sm: '100px' } }}
         >
           {createPatient.isPending ? 'Creating...' : 'Create Patient'}
         </Button>

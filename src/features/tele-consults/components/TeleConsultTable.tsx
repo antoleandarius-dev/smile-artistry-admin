@@ -77,8 +77,8 @@ const TeleConsultTable: React.FC<TeleConsultTableProps> = ({
   }
 
   return (
-    <TableContainer component={Paper}>
-      <Table>
+    <TableContainer component={Paper} sx={{ overflowX: { xs: 'auto', md: 'visible' } }}>
+      <Table sx={{ minWidth: { xs: 900, md: 'auto' } }}>
         <TableHead>
           <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
             <TableCell>Appointment ID</TableCell>

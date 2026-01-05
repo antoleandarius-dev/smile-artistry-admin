@@ -15,10 +15,13 @@ import {
   Alert,
   CircularProgress,
   Typography,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import { useRescheduleAppointment } from '../hooks';
 import type { Appointment } from '../types';
 import { format, parseISO } from 'date-fns';
+import { RESPONSIVE_PATTERNS } from '../../../styles/responsive';
 
 interface RescheduleDialogProps {
   open: boolean;
@@ -31,6 +34,9 @@ const RescheduleDialog: React.FC<RescheduleDialogProps> = ({
   appointment,
   onClose,
 }) => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   // Parse initial date/time from appointment
   const initialDateTime = useMemo(() => {
     if (!appointment) return { date: '', time: '' };
@@ -86,11 +92,22 @@ const RescheduleDialog: React.FC<RescheduleDialogProps> = ({
   const isFormValid = newDate && newTime;
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      maxWidth={isSmallScreen ? 'xs' : 'sm'}
+      fullWidth
+      PaperProps={{
+        sx: {
+          m: { xs: 1, sm: 2 },
+          width: { xs: 'calc(100% - 16px)', sm: '100%' },
+        }
+      }}
+    >
       <form onSubmit={handleSubmit}>
-        <DialogTitle>Reschedule Appointment</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+        <DialogTitle sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Reschedule Appointment</DialogTitle>
+        <DialogContent sx={{ ...RESPONSIVE_PATTERNS.responsivePadding }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, sm: 2 }, mt: 1.5 }}>
             {rescheduleMutation.isError && (
               <Alert severity="error">
                 Failed to reschedule appointment. Please try again.
@@ -132,7 +149,7 @@ const RescheduleDialog: React.FC<RescheduleDialogProps> = ({
             />
           </Box>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: { xs: 1.5, sm: 2 }, gap: { xs: 1, sm: 1.5 } }}>
           <Button onClick={handleClose} disabled={rescheduleMutation.isPending}>
             Cancel
           </Button>

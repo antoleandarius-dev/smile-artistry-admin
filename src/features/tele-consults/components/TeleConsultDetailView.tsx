@@ -11,10 +11,13 @@ import {
   Paper,
   Divider,
   CircularProgress,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
 import type { TeleSessionAdminResponse } from '../../../api/tele-sessions.service';
 import { teleSessionsService } from '../../../api/tele-sessions.service';
+import { RESPONSIVE_PATTERNS } from '../../../styles/responsive';
 
 interface TeleConsultDetailViewProps {
   session: TeleSessionAdminResponse | null;
@@ -50,6 +53,9 @@ const TeleConsultDetailView: React.FC<TeleConsultDetailViewProps> = ({
   onClose,
   onStatusUpdated,
 }) => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [statusCheckMessage, setStatusCheckMessage] = useState<string | null>(null);
 
   // Mutation for checking status
@@ -91,10 +97,21 @@ const TeleConsultDetailView: React.FC<TeleConsultDetailViewProps> = ({
   const isLoading = checkStatusMutation.isPending;
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Tele-Consultation Session Details</DialogTitle>
-      <DialogContent sx={{ pt: 2 }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      maxWidth={isSmallScreen ? 'xs' : 'sm'}
+      fullWidth
+      PaperProps={{
+        sx: {
+          m: { xs: 1, sm: 2 },
+          width: { xs: 'calc(100% - 16px)', sm: '100%' },
+        }
+      }}
+    >
+      <DialogTitle sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>Tele-Consultation Session Details</DialogTitle>
+      <DialogContent sx={{ ...RESPONSIVE_PATTERNS.responsivePadding, pt: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, sm: 3 } }}>
           {/* Session Identification */}
           <Paper sx={{ p: 2, backgroundColor: '#f9f9f9' }}>
             <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
@@ -239,7 +256,7 @@ const TeleConsultDetailView: React.FC<TeleConsultDetailViewProps> = ({
           )}
         </Box>
       </DialogContent>
-      <DialogActions sx={{ gap: 1, p: 2 }}>
+      <DialogActions sx={{ gap: { xs: 0.5, sm: 1 }, p: { xs: 1.5, sm: 2 } }}>
         <Button
           onClick={() => checkStatusMutation.mutate()}
           variant="contained"

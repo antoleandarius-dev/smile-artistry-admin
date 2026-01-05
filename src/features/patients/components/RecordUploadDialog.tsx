@@ -19,8 +19,11 @@ import {
   Alert,
   Paper,
   Typography,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import { CloudUpload as CloudUploadIcon } from '@mui/icons-material';
+import { RESPONSIVE_PATTERNS } from '../../../styles/responsive';
 import type { RecordSource } from '../types';
 import { useUploadMigratedRecord } from '../hooks';
 
@@ -31,6 +34,8 @@ interface RecordUploadDialogProps {
 }
 
 const RecordUploadDialog = ({ open, patientId, onClose }: RecordUploadDialogProps) => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const [file, setFile] = useState<File | null>(null);
   const [source, setSource] = useState<RecordSource>('scan');
   const [notes, setNotes] = useState('');
@@ -103,10 +108,23 @@ const RecordUploadDialog = ({ open, patientId, onClose }: RecordUploadDialogProp
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Upload Old Record</DialogTitle>
-      <DialogContent>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      maxWidth={isSmallScreen ? 'xs' : 'sm'}
+      fullWidth
+      PaperProps={{
+        sx: {
+          m: { xs: 1, sm: 2 },
+          width: { xs: 'calc(100% - 16px)', sm: '100%' },
+        }
+      }}
+    >
+      <DialogTitle sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+        Upload Old Record
+      </DialogTitle>
+      <DialogContent sx={{ ...RESPONSIVE_PATTERNS.responsivePadding }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, sm: 2 }, pt: 1.5 }}>
           {validationError && (
             <Alert severity="error" onClose={() => setValidationError(null)}>
               {validationError}
@@ -187,7 +205,7 @@ const RecordUploadDialog = ({ open, patientId, onClose }: RecordUploadDialogProp
           />
         </Box>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ p: { xs: 1.5, sm: 2 }, gap: { xs: 1, sm: 1.5 } }}>
         <Button onClick={handleClose} disabled={uploadRecord.isPending}>
           Cancel
         </Button>
